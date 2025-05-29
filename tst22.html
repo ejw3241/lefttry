@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>왼트_LeftTry</title>
+    <style>
+        @font-face {
+            font-family: 'NeoDunggeunmoPro';
+            src: url('Data/font/NeoDunggeunmoPro-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            background-color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+        #game-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #game-container {
+            display: inline-block;
+            background-color: #080808;
+            padding: calc(10px * 1.25);
+        }
+        .grid {
+            display: grid;
+            gap: calc(2px * 1.25);
+        }
+        .tile {
+            width: calc(40px * 1.25);
+            height: calc(40px * 1.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: calc(16px * 1.25);
+            color: #000;
+            cursor: pointer;
+            position: relative;
+        }
+        .tile img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            z-index: 1;
+            pointer-events: none; /* 이미지 클릭 무시, 부모 tile로 전파 */
+        }
+        .empty { background-color: #293141; } /* 00 */
+        .floor { background-color: #15181F; } /* -- */
+        .floor::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 0;
+        }
+        .green { background-color: #00FF00; }
+        .yellow { background-color: #FFFF00; }
+        .red { background-color: #FF0000; }
+        .blue { background-color: #0000FF; }
+        #stage-display {
+            font-size: calc(18px * 1.25);
+            text-align: center;
+            margin-bottom: calc(10px * 1.25);
+            color: #fff;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+        #message {
+            font-size: calc(20px * 1.25);
+            text-align: center;
+            margin-top: calc(10px * 1.25);
+            color: #fff;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+        #tooltip {
+            font-size: calc(16px * 1.25);
+            text-align: center;
+            margin-top: calc(10px * 1.25);
+            color: #ccc;
+            max-width: calc(600px * 1.25);
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+        #tooltip p {
+            margin: calc(5px * 1.25) 0;
+        }
+        #clear-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: calc(48px * 1.25);
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: calc(20px * 1.25) calc(40px * 1.25);
+            border-radius: calc(10px * 1.25);
+            display: none;
+            z-index: 1000;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        .fade-in-out {
+            animation: fadeInOut 2s ease-in-out;
+        }
+        @keyframes attackEffect {
+            0% { background-color: rgba(255, 0, 0, 0); }
+            50% { background-color: rgba(255, 0, 0, 0.7); }
+            100% { background-color: rgba(255, 0, 0, 0); }
+        }
+        .attack-effect {
+            animation: attackEffect 0.5s ease-in-out;
+        }
+        #bgm {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-wrapper">
+        <div id="game-container">
+            <div id="stage-display"></div>
+            <div id="grid" class="grid"></div>
+            <div id="message"></div>
+        </div>
+        <div id="tooltip"></div>
+    </div>
+    <div id="clear-message">Clear!</div>
+    <audio id="bgm" loop></audio>
+
+    <script>
+        // --- 배경음악 설정 ---
+        // 배경음악(BGM)을 로드하고, 첫 키 입력 시 재생
+        const bgmUrl = 'Data/music/1. Baba Is You Theme.mp3';
+        const bgm = document.getElementById('bgm');
+        let bgmLoaded = false;
+        if (bgmUrl) {
+            bgm.src = bgmUrl;
+            bgm.volume = 0.5;
+            bgm.muted = false;
+            bgm.onerror = () => console.warn('BGM 로드 실패:', bgmUrl, bgm.error);
+            bgm.onloadeddata = () => {
+                console.log('BGM 로드 성공:', bgmUrl);
+                bgmLoaded = true;
+            };
+            bgm.oncanplay = () => console.log('BGM 재생 가능 상태');
+            bgm.onplay = () => console.log('BGM 재생 중');
+            bgm.onended = () => console.log('BGM 재생 종료');
+        }
+
+        // --- 타일 및 오브젝트 이미지 매핑 ---
+        // 타일과 오브젝트의 이미지 경로를 정의
+        const tileImages = {
+            //'--': '' // 바닥 타일 이미지
+        };
+        const objectImages = {
+            //'1P': 'Data/sprites/platest.png',   // 초록색 플레이어
+            //'2P': 'Data/sprites/platestY.png',  // 노란색 플레이어
+            //'3P': 'Data/sprites/platestR.png',  // 빨간색 플레이어
+            //'2F': 'Data/sprites/2F.png',        // 노란색 도착점
+            //'2W': 'Data/sprites/2W.png',        // 노란색 벽
+            //'3W': 'Data/sprites/3W.png',        // 빨간색 벽
+            //'1W': 'Data/sprites/1W.png',        // 초록색 벽
+            //'3F': 'Data/sprites/3F.png',        // 빨간색 도착점
+            //'1F': 'Data/sprites/1F.png',        // 초록색 도착점
+            //'3B': 'Data/sprites/eneBtest.png',  // 빨간색 적 (B)
+            //'1B': 'Data/sprites/eneBtestG.png', // 초록색 적 (B)
+            //'2B': 'Data/sprites/eneBtestY.png', // 노란색 적 (B)
+            //'4W': 'Data/sprites/4W.png',        // 파란색 벽
+            //'3A': 'Data/sprites/eneAtest.png',  // 빨간색 적 (A)
+            //'1A': 'Data/sprites/eneAtestG.png', // 초록색 적 (A)
+            //'2A': 'Data/sprites/eneAtestY.png'  // 노란색 적 (A)
+            //--
+            //-- 스프라이트 파일 이름 형식 설명
+            // [색/물체.png] 예시-> 2W.png : 노란색 벽 물체png, 4A.png : 파란색 근거리 공격 물체png.
+            // [색/물체_스트라이프구분/방향.png] 예시 -> 1P_aB.png : 초록색 플레이어 물체의 Bottom쪽을 바라보는 스트라이프a, 1P_bB.png : 초록색 플레이어 물체의 Bottom쪽을 바라보는 스트라이프b, 1P_aT.png : 초록색 플레이어 물체의 Top쪽을 바라보는 스트라이프a
+            // 이동 할 때 마다 스트라이프는 a<->b 계속 변환하여 애니메이션 효과 부여
+            // 방향은 "T, B, L, R" 속성이 존재하며, 각각 "상, 하, 좌, 우" 를 의미
+            // 스트라이프가 존재하는 물체는 "플레이어, 근거리 공격, 원거리 공격"만 존재
+            '1P_aT': 'Data/sprites/1P_aT.png', // 초록색 플레이어 aT
+            '1P_aB': 'Data/sprites/1P_aB.png', // 초록색 플레이어 aB
+            '1P_aL': 'Data/sprites/1P_aL.png', // 초록색 플레이어 aL
+            '1P_aR': 'Data/sprites/1P_aR.png', // 초록색 플레이어 aR
+
+            '1P_bT': 'Data/sprites/1P_bT.png', // 초록색 플레이어 bT
+            '1P_bB': 'Data/sprites/1P_bB.png', // 초록색 플레이어 bB
+            '1P_bL': 'Data/sprites/1P_bL.png', // 초록색 플레이어 bL
+            '1P_bR': 'Data/sprites/1P_bR.png', // 초록색 플레이어 bR
+            
+            '1F': 'Data/sprites/1F.png', // 초록색 도착점
+
+            '1A_aT': 'Data/sprites/1A_at.png', // 초록색 근거리 공격 aT
+            '1A_aB': 'Data/sprites/1A_aB.png', // 초록색 근거리 공격 aB
+            '1A_aL': 'Data/sprites/1A_aL.png', // 초록색 근거리 공격 aL
+            '1A_aR': 'Data/sprites/1A_aR.png', // 초록색 근거리 공격 aR
+
+            '1A_bT': 'Data/sprites/1A_bT.png', // 초록색 근거리 공격 bT
+            '1A_bB': 'Data/sprites/1A_bB.png', // 초록색 근거리 공격 bB
+            '1A_bL': 'Data/sprites/1A_bL.png', // 초록색 근거리 공격 bL
+            '1A_bR': 'Data/sprites/1A_bR.png', // 초록색 근거리 공격 bR
+
+            '1B_aT': 'Data/sprites/1B_at.png', // 초록색 원거리 공격 aT
+            '1B_aB': 'Data/sprites/1B_aB.png', // 초록색 원거리 공격 aB
+            '1B_aL': 'Data/sprites/1B_aL.png', // 초록색 원거리 공격 aL
+            '1B_aR': 'Data/sprites/1B_aR.png', // 초록색 원거리 공격 aR
+
+            '1B_bT': 'Data/sprites/1B_bT.png', // 초록색 원거리 공격 bT
+            '1B_bB': 'Data/sprites/1B_bB.png', // 초록색 원거리 공격 bB
+            '1B_bL': 'Data/sprites/1B_bL.png', // 초록색 원거리 공격 bL
+            '1B_bR': 'Data/sprites/1B_bR.png', // 초록색 원거리 공격 bR
+
+            '1W': 'Data/sprites/1W.png', // 초록색 벽
+            '1I': 'Data/sprites/1I.png', // 초록색 무적 벽
+            //--
+            '2P_aT': 'Data/sprites/2P_aT.png', // 노란색 플레이어 aT
+            '2P_aB': 'Data/sprites/2P_aB.png', // 노란색 플레이어 aB
+            '2P_aL': 'Data/sprites/2P_aL.png', // 노란색 플레이어 aL
+            '2P_aR': 'Data/sprites/2P_aR.png', // 노란색 플레이어 aR
+
+            '2P_bT': 'Data/sprites/2P_bT.png', // 노란색 플레이어 bT
+            '2P_bB': 'Data/sprites/2P_bB.png', // 노란색 플레이어 bB
+            '2P_bL': 'Data/sprites/2P_bL.png', // 노란색 플레이어 bL
+            '2P_bR': 'Data/sprites/2P_bR.png', // 노란색 플레이어 bR
+
+            '2F': 'Data/sprites/2F.png', // 노란색 도착점
+
+            '2A_aT': 'Data/sprites/2A_at.png', // 노란색 근거리 공격 aT
+            '2A_aB': 'Data/sprites/2A_aB.png', // 노란색 근거리 공격 aB
+            '2A_aL': 'Data/sprites/2A_aL.png', // 노란색 근거리 공격 aL
+            '2A_aR': 'Data/sprites/2A_aR.png', // 노란색 근거리 공격 aR
+
+            '2A_bT': 'Data/sprites/2A_bT.png', // 노란색 근거리 공격 bT
+            '2A_bB': 'Data/sprites/2A_bB.png', // 노란색 근거리 공격 bB
+            '2A_bL': 'Data/sprites/2A_bL.png', // 노란색 근거리 공격 bL
+            '2A_bR': 'Data/sprites/2A_bR.png', // 노란색 근거리 공격 bR
+
+            '2B_aT': 'Data/sprites/2B_at.png', // 노란색 원거리 공격 aT
+            '2B_aB': 'Data/sprites/2B_aB.png', // 노란색 원거리 공격 aB
+            '2B_aL': 'Data/sprites/2B_aL.png', // 노란색 원거리 공격 aL
+            '2B_aR': 'Data/sprites/2B_aR.png', // 노란색 원거리 공격 aR
+
+            '2B_bT': 'Data/sprites/2B_bT.png', // 노란색 원거리 공격 bT
+            '2B_bB': 'Data/sprites/2B_bB.png', // 노란색 원거리 공격 bB
+            '2B_bL': 'Data/sprites/2B_bL.png', // 노란색 원거리 공격 bL
+            '2B_bR': 'Data/sprites/2B_bR.png', // 노란색 원거리 공격 bR
+
+            '2W': 'Data/sprites/2W.png', // 노란색 벽
+            '2I': 'Data/sprites/2I.png', // 노란색 무적 벽
+            //--
+            '3P_aT': 'Data/sprites/3P_aT.png', // 빨간색 플레이어 aT
+            '3P_aB': 'Data/sprites/3P_aB.png', // 빨간색 플레이어 aB
+            '3P_aL': 'Data/sprites/3P_aL.png', // 빨간색 플레이어 aL
+            '3P_aR': 'Data/sprites/3P_aR.png', // 빨간색 플레이어 aR
+
+            '3P_bT': 'Data/sprites/3P_bT.png', // 빨간색 플레이어 bT
+            '3P_bB': 'Data/sprites/3P_bB.png', // 빨간색 플레이어 bB
+            '3P_bL': 'Data/sprites/3P_bL.png', // 빨간색 플레이어 bL
+            '3P_bR': 'Data/sprites/3P_bR.png', // 빨간색 플레이어 bR
+
+            '3F': 'Data/sprites/3F.png', // 빨간색 도착점
+
+            '3A_aT': 'Data/sprites/3A_at.png', // 빨간색 근거리 공격 aT
+            '3A_aB': 'Data/sprites/3A_aB.png', // 빨간색 근거리 공격 aB
+            '3A_aL': 'Data/sprites/3A_aL.png', // 빨간색 근거리 공격 aL
+            '3A_aR': 'Data/sprites/3A_aR.png', // 빨간색 근거리 공격 aR
+
+            '3A_bT': 'Data/sprites/3A_bT.png', // 빨간색 근거리 공격 bT
+            '3A_bB': 'Data/sprites/3A_bB.png', // 빨간색 근거리 공격 bB
+            '3A_bL': 'Data/sprites/3A_bL.png', // 빨간색 근거리 공격 bL
+            '3A_bR': 'Data/sprites/3A_bR.png', // 빨간색 근거리 공격 bR
+
+            '3B_aT': 'Data/sprites/3B_at.png', // 빨간색 원거리 공격 aT
+            '3B_aB': 'Data/sprites/3B_aB.png', // 빨간색 원거리 공격 aB
+            '3B_aL': 'Data/sprites/3B_aL.png', // 빨간색 원거리 공격 aL
+            '3B_aR': 'Data/sprites/3B_aR.png', // 빨간색 원거리 공격 aR
+
+            '3B_bT': 'Data/sprites/3B_bT.png', // 빨간색 원거리 공격 bT
+            '3B_bB': 'Data/sprites/3B_bB.png', // 빨간색 원거리 공격 bB
+            '3B_bL': 'Data/sprites/3B_bL.png', // 빨간색 원거리 공격 bL
+            '3B_bR': 'Data/sprites/3B_bR.png', // 빨간색 원거리 공격 bR
+
+            '3W': 'Data/sprites/3W.png', // 빨간색 벽
+            '3I': 'Data/sprites/3I.png', // 빨간색 무적 벽
+            //--
+            '4A_aT': 'Data/sprites/4A_at.png', // 파란색 근거리 공격 aT
+            '4A_aB': 'Data/sprites/4A_aB.png', // 파란색 근거리 공격 aB
+            '4A_aL': 'Data/sprites/4A_aL.png', // 파란색 근거리 공격 aL
+            '4A_aR': 'Data/sprites/4A_aR.png', // 파란색 근거리 공격 aR
+
+            '4A_bT': 'Data/sprites/4A_bT.png', // 파란색 근거리 공격 bT
+            '4A_bB': 'Data/sprites/4A_bB.png', // 파란색 근거리 공격 bB
+            '4A_bL': 'Data/sprites/4A_bL.png', // 파란색 근거리 공격 bL
+            '4A_bR': 'Data/sprites/4A_bR.png', // 파란색 근거리 공격 bR
+
+            '4B_aT': 'Data/sprites/4B_at.png', // 파란색 원거리 공격 aT
+            '4B_aB': 'Data/sprites/4B_aB.png', // 파란색 원거리 공격 aB
+            '4B_aL': 'Data/sprites/4B_aL.png', // 파란색 원거리 공격 aL
+            '4B_aR': 'Data/sprites/4B_aR.png', // 파란색 원거리 공격 aR
+
+            '4B_bT': 'Data/sprites/4B_bT.png', // 파란색 원거리 공격 bT
+            '4B_bB': 'Data/sprites/4B_bB.png', // 파란색 원거리 공격 bB
+            '4B_bL': 'Data/sprites/4B_bL.png', // 파란색 원거리 공격 bL
+            '4B_bR': 'Data/sprites/4B_bR.png', // 파란색 원거리 공격 bR
+
+            '4W': 'Data/sprites/4W.png', // 파란색 벽
+            '4I': 'Data/sprites/4I.png', // 파란색 무적 벽
+        };
+
+        // --- 스테이지 데이터 ---
+        // 각 스테이지의 맵과 툴팁 정의
+        const stages = [
+            {
+                map: [
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '2I', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '00', '00', '3A', '00', '--', '--', '--', '--', '00', '1P', '--', '--', '--', '--', '3B', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '00', '--', '--', '--', '--', '00', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '2F', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--']
+                ],
+                tooltip: [
+                    'P-1 Stage.',
+                    'Test A, B'
+                ]
+            },
+            {
+                map: [
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
+                    ['00', '1P', '--', '--', '--', '--', '--', '--', '2F', '00'],
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00']
+                ],
+                tooltip: [
+                    '초록색 플레이어가 노란색 도착점에 닿으면 레벨이 클리어 됩니다.',
+                    'W, A, S, D로 이동합니다'
+                    // 챕터 0 - 스테이지 1 (튜토리얼)
+                ]
+            },
+            {
+                map: [
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
+                    ['00', '00', '00', '--', '--', '--', '--', '00', '00', '00'],
+                    ['00', '00', '00', '--', '00', '00', '00', '00', '00', '00'],
+                    ['00', '1P', '--', '--', '2W', '--', '--', '--', '2F', '00'],
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00']
+                ],
+                tooltip: [
+                    '모든 규칙은 왼쪽부터 적용됩니다.',
+                    '"SPACE"키로 물체를 부술 수 있습니다.'
+                    // 챕터 0 - 스테이지 2 (튜토리얼)
+                ]
+            },
+            {
+                map: [
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
+                    ['00', '3F', '--', '--', '--', '--', '--', '--', '1P', '00'],
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00']
+                ],
+                tooltip: [
+                    '모든 규칙은 왼쪽부터 적용됩니다.',
+                    '"TAP"키로 물체의 색을 바꿀 수 있습니다.',
+                    '바뀌는 순서는 초록 > 노랑 > 빨강 순서입니다.'
+                    // 챕터 0 - 스테이지 3 (튜토리얼)
+                ]
+            },
+            {
+                map: [
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
+                    ['00', '00', '00', '00', '00', '00', '3B', '00', '00', '00', '00', '00'],
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
+                    ['00', '1P', '--', '--', '--', '--', '--', '--', '--', '--', '2F', '00'],
+                    ['00', '00', '--', '00', '00', '00', '00', '00', '00', '00', '--', '00'],
+                    ['00', '00', '--', '--', '--', '--', '--', '--', '--', '--', '--', '00'],
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00']
+                ],
+                tooltip: [
+                    '빨간색 물체는 당신을 공격하는 적입니다.'
+                    // 챕터 0 - 스테이지 4 (튜토리얼)
+                ]
+            },
+            {
+                map: [
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
+                    ['00', '4W', '--', '--', '--', '00', '00', '00', '00', '00', '00'],
+                    ['00', '00', '00', '00', '--', '00', '00', '00', '00', '00', '00'],
+                    ['00', '00', '3P', '--', '--', '--', '--', '00', '00', '00', '00'],
+                    ['00', '00', '00', '00', '00', '00', '--', '00', '00', '00', '00'],
+                    ['00', '00', '00', '1A', '--', '--', '--', '--', '--', '2F', '00'],
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00']
+                ],
+                tooltip: [
+                    '예외로 파란색 물체는 어떠한 규칙도 통하지 않습니다.',
+                    '게다가 이들이 가장 왼쪽에 있으면 다른 물체들도 규칙을 물려받을 수 없게 됩니다.',
+                    ' ',
+                    '마우스 좌클릭으로 물체를 부술 수 있습니다. (공격 가능 물체만)',
+                    '마우스 좌클릭으로 어떤 물체를 조작할지 선택할 수 있습니다.'
+                    // 챕터 0 - 스테이지 5 (튜토리얼)
+                ]
+            },
+            {
+                map: [
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
+                    ['00', '--', '--', '--', '--', '--', '--', '--', '--', '00'],
+                    ['00', '--', '00', '00', '00', '00', '00', '00', '--', '00'],
+                    ['00', '--', '00', '00', '00', '00', '00', '00', '--', '00'],
+                    ['00', '--', '--', '2F', '00', '00', '1P', '--', '--', '00'],
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00']
+                ],
+                tooltip: [
+                    'insert tooltip here', '(8, 2)2W 이동 로직 만들고 나면 넣기.'
+                    // 챕터 1 - 스테이지 1
+                ]
+            },
+            {
+                map: [
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
+                    ['00', '00', '3B', '00', '3B', '00', '3B', '00', '00', '00'],
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
+                    ['00', '--', '--', '--', '--', '--', '--', '--', '2F', '00'],
+                    ['00', '--', '00', '00', '00', '00', '00', '00', '00', '00'],
+                    ['00', '--', '--', '--', '--', '--', '--', '--', '--', '00'],
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '--', '00'],
+                    ['00', '1P', '--', '--', '--', '--', '--', '--', '--', '00'],
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00']
+                ],
+                tooltip: [
+                    'insert tooltip here'
+                    // 챕터 1 - 스테이지 2
+                ]
+            },
+            {
+                map: [
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
+                    ['00', '00', '00', '3A', '2W', '--', '00', '00', '00', '00'],
+                    ['00', '00', '00', '00', '00', '--', '00', '00', '00', '00'],
+                    ['00', '1P', '--', '--', '--', '2W', '--', '--', '2F', '00'],
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00']
+                ],
+                tooltip: [
+                    'insert tooltip here'
+                    // 챕터 1 - 스테이지 3
+                ]
+            },
+            {
+                map: [
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
+                    ['00', '00', '--', '--', '--', '--', '--', '--', '--', '00'],
+                    ['00', '00', '--', '00', '00', '00', '00', '00', '--', '00'],
+                    ['00', '00', '--', '--', '--', '--', '3F', '00', '3A', '00'],
+                    ['00', '00', '00', '00', '00', '00', '--', '00', '00', '00'],
+                    ['00', '--', '--', '--', '--', '1P', '--', '--', '--', '00'],
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00']
+                ],
+                tooltip: [
+                    'insert tooltip here', '(5,3) 4W, 3A의 어그로 이동 로직 만들고 나면 넣기'
+                    // 챕터 1 - 스테이지 4
+                ]
+            },
+            {
+                map: [
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
+                    ['00', '--', '--', '--', '--', '--', '--', '00', '2F', '00'],
+                    ['00', '--', '00', '00', '00', '00', '00', '4W', '--', '00'],
+                    ['00', '--', '00', '--', '--', '--', '00', '--', '00', '00'],
+                    ['00', '--', '00', '--', '00', '00', '4W', '--', '00', '00'],
+                    ['00', '2A', '00', '2A', '00', '00', '3P', '00', '00', '00'],
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00']
+                ],
+                tooltip: [
+                    'insert tooltip here'
+                    // 챕터 1 - 스테이지 5
+                ]
+            }
+        ];
+
+        // --- 게임 상태 변수 ---
+        // 게임 진행에 필요한 전역 상태 관리
+        let currentStage = 0; // 현재 스테이지 인덱스
+        let turnCount = 0; // 현재 턴 수
+        let gameState = {
+            selected: null, // 현재 선택된 오브젝트
+            objects: [], // 맵 상의 오브젝트 목록
+            history: [], // 행동 히스토리 (되돌리기용)
+            tooltipOverride: null // 툴팁 오버라이드 메시지
+        };
+        let gameOver = false; // 게임 오버 여부
+        const grid = document.getElementById('grid');
+        const message = document.getElementById('message');
+        const tooltip = document.getElementById('tooltip');
+        const stageDisplay = document.getElementById('stage-display');
+        const clearMessage = document.getElementById('clear-message');
+        const MAX_HISTORY = 100; // 최대 히스토리 저장 개수
+
+        // --- 게임 로직 함수 ---
+
+        // loadStage: 스테이지 데이터를 로드하고 초기화
+        function loadStage() {
+            const stage = stages[currentStage];
+            gameState.objects = [];
+            // 맵에서 오브젝트 추출 (00: 빈칸, --: 바닥 제외)
+            for (let row = 0; row < stage.map.length; row++) {
+                for (let col = 0; col < stage.map[0].length; col++) {
+                    const code = stage.map[row][col];
+                    if (code !== '00' && code !== '--') {
+                        const type = code.slice(1); // 오브젝트 타입 (P, F, W 등)
+                        const color = code[0] === '1' ? 'green' : code[0] === '2' ? 'yellow' : code[0] === '3' ? 'red' : 'blue';
+                        gameState.objects.push({ row, col, type, color });
+                    }
+                }
+            }
+            // 초록색 플레이어(1P)를 기본 선택
+            gameState.selected = gameState.objects.find(o => o.type === 'P' && o.color === 'green');
+            turnCount = 0;
+            gameOver = false;
+            gameState.history = [];
+            gameState.tooltipOverride = null;
+            console.log(`Turn: ${turnCount}`);
+            renderMap();
+        }
+
+        // renderMap: 맵과 UI를 렌더링
+        function renderMap() {
+            const stage = stages[currentStage];
+            // 그리드 크기 동적 설정
+            grid.style.gridTemplateColumns = `repeat(${stage.map[0].length}, calc(40px * 1.25))`;
+            grid.style.gridTemplateRows = `repeat(${stage.map.length}, calc(40px * 1.25))`;
+            grid.innerHTML = '';
+
+            // 맵 타일 생성
+            for (let row = 0; row < stage.map.length; row++) {
+                for (let col = 0; col < stage.map[0].length; col++) {
+                    const tile = document.createElement('div');
+                    tile.classList.add('tile');
+                    tile.classList.add(stage.map[row][col] === '00' ? 'empty' : 'floor');
+
+                    // 오브젝트 렌더링
+                    const obj = gameState.objects.find(o => o.row === row && o.col === col);
+                    if (obj) {
+                        const objCode = `${obj.color === 'green' ? '1' : obj.color === 'yellow' ? '2' : obj.color === 'red' ? '3' : '4'}${obj.type}`;
+                        if (objectImages[objCode]) {
+                            const img = document.createElement('img');
+                            img.src = objectImages[objCode];
+                            img.alt = obj.type;
+                            img.onerror = () => {
+                                tile.classList.add(obj.color);
+                                tile.textContent = obj.type; // 이미지 로드 실패 시 색상+텍스트 대체
+                            };
+                            tile.appendChild(img);
+                        } else {
+                            tile.classList.add(obj.color);
+                            tile.textContent = obj.type;
+                        }
+                        // 선택된 오브젝트 표시
+                        if (gameState.selected && gameState.selected.row === row && gameState.selected.col === col) {
+                            tile.style.border = '2px solid #fff';
+                        }
+                    }
+                    tile.dataset.row = row;
+                    tile.dataset.col = col;
+                    grid.appendChild(tile);
+                }
+            }
+            // 메시지 및 UI 업데이트
+            message.textContent = gameOver ? 'Z: 한 칸 되돌리기, R: 스테이지 초기화 하기' : '';
+            stageDisplay.textContent = `Stage: ${currentStage + 1}`;
+            const tooltipText = gameState.tooltipOverride ? [gameState.tooltipOverride] : stage.tooltip;
+            tooltip.innerHTML = tooltipText.map(line => `<p>${line}</p>`).join('');
+        }
+
+        // canMove: 오브젝트 이동 가능 여부 확인
+        function canMove(row, col, movingObj) {
+            const stage = stages[currentStage];
+            // 맵 범위 및 빈칸(00) 체크
+            if (row < 0 || row >= stage.map.length || col < 0 || col >= stage.map[0].length || stage.map[row][col] === '00') {
+                return false;
+            }
+            // 타겟 위치의 오브젝트 체크
+            const obj = gameState.objects.find(o => o.row === row && o.col === col);
+            if (obj) {
+                // 1P와 2F 겹침 허용
+                return obj.type === 'F' && obj.color === 'yellow' && movingObj.type === 'P' && movingObj.color === 'green';
+            }
+            return true;
+        }
+
+        // addHistory: 행동을 히스토리에 저장 (되돌리기용)
+        function addHistory(action, data) {
+            gameState.history.push({ action, data });
+            if (gameState.history.length > MAX_HISTORY) {
+                gameState.history.shift(); // 최대 히스토리 초과 시 오래된 항목 제거
+            }
+        }
+
+        // advanceTurn: 턴 진행 및 적 행동 처리
+        function advanceTurn() {
+            if (gameOver) return;
+            turnCount++;
+            console.log(`Turn: ${turnCount}`);
+
+            // 빨간색 적(3B)의 공격 로직
+            gameState.objects.forEach(obj => {
+                if (obj.color === 'red' && obj.type === 'B') {
+                    const range = 3; // 공격 범위 (7x7)
+                    const greenObjs = gameState.objects.filter(o => o.color === 'green');
+                    // 초록색 오브젝트를 순회하며 공격 대상 확인
+                    greenObjs.forEach(green => {
+                        // 범위 내 타겟 체크
+                        if (Math.abs(green.row - obj.row) <= range && Math.abs(green.col - obj.col) <= range) {
+                            obj.moving = true; // 공격 상태 표시
+                            // 2턴 마다 공격 실행
+                            if (turnCount % 2 === 0) {
+                                // 공격 애니메이션 적용
+                                const tile = grid.querySelector(`.tile[data-row="${green.row}"][data-col="${green.col}"]`);
+                                if (tile) {
+                                    tile.classList.add('attack-effect');
+                                    setTimeout(() => tile.classList.remove('attack-effect'), 500);
+                                }
+                                // 타겟 제거 및 히스토리 저장
+                                addHistory('attack', { target: { ...green } });
+                                gameState.objects = gameState.objects.filter(o => o !== green);
+                                if (green === gameState.selected) gameState.selected = null;
+                                gameOver = true; // 게임 오버 설정
+                            }
+                        } else {
+                            obj.moving = false; // 공격 대상 없으면 비활성화
+                        }
+                    });
+                }
+            });
+            renderMap();
+        }
+
+        // findLeftmost: 가장 왼쪽 오브젝트 찾기
+        function findLeftmost() {
+            let leftmost = null;
+            gameState.objects.forEach(obj => {
+                if (!leftmost || obj.col < leftmost.col || (obj.col === leftmost.col && obj.row < leftmost.row)) {
+                    leftmost = obj;
+                }
+            });
+            return leftmost;
+        }
+
+        // --- 이벤트 리스너 ---
+
+        // 키 입력 처리
+        document.addEventListener('keydown', (e) => {
+            // BGM 재생 (첫 키 입력 시)
+            if (bgmLoaded && bgm.paused) {
+                console.log('Attempting to play BGM on keydown');
+                bgm.play().then(() => console.log('BGM 재생 시작:', bgmUrl))
+                    .catch(err => console.warn('BGM 재생 실패:', err));
+            }
+
+            if (gameOver && e.key !== 'z' && e.key !== 'r') return;
+            let actionTaken = false;
+
+            // 이동 (WASD)
+            if (e.key === 'w' || e.key === 's' || e.key === 'a' || e.key === 'd') {
+                if (!gameState.selected || gameState.selected.color !== 'green' || gameState.selected.type === 'F') return;
+                const newPos = { row: gameState.selected.row, col: gameState.selected.col };
+                if (e.key === 'w') newPos.row--;
+                else if (e.key === 's') newPos.row++;
+                else if (e.key === 'a') newPos.col--;
+                else if (e.key === 'd') newPos.col++;
+                if (canMove(newPos.row, newPos.col, gameState.selected)) {
+                    addHistory('move', {
+                        obj: gameState.selected,
+                        oldRow: gameState.selected.row,
+                        oldCol: gameState.selected.col
+                    });
+                    gameState.selected.row = newPos.row;
+                    gameState.selected.col = newPos.col;
+                    actionTaken = true;
+                    // 클리어 조건 체크
+                    if (gameState.selected.type === 'P' && gameState.objects.some(o => o.row === newPos.row && o.col === newPos.col && o.type === 'F' && o.color === 'yellow')) {
+                        currentStage++;
+                        if (currentStage >= stages.length) currentStage = 0;
+                        clearMessage.style.display = 'block';
+                        clearMessage.classList.add('fade-in-out');
+                        setTimeout(() => {
+                            clearMessage.style.display = 'none';
+                            clearMessage.classList.remove('fade-in-out');
+                        }, 2000);
+                        loadStage();
+                        return;
+                    }
+                }
+            }
+            // 제거 (Space)
+            else if (e.key === ' ') {
+                const leftmost = findLeftmost();
+                if (leftmost && leftmost.color === 'blue') {
+                    message.textContent = '파란색 물체로 인해 규칙이 막혔습니다';
+                    setTimeout(() => message.textContent = '', 3000);
+                    return;
+                }
+                if (leftmost) {
+                    addHistory('remove', { obj: { ...leftmost } });
+                    gameState.objects = gameState.objects.filter(o => o !== leftmost);
+                    if (leftmost === gameState.selected) gameState.selected = gameState.objects.find(o => o.color === 'green' && o.type !== 'F') || null;
+                    // 게임 오버 조건
+                    if (leftmost.type === 'F' && leftmost.color === 'yellow') {
+                        gameState.tooltipOverride = 'R을 눌러 스테이지 재시작';
+                        gameOver = true;
+                    } else if (currentStage === 1 && leftmost.type === 'P' && leftmost.color === 'green') {
+                        gameState.tooltipOverride = 'R을 눌러 스테이지 재시작';
+                        gameOver = true;
+                    }
+                }
+                actionTaken = true;
+                renderMap();
+            }
+            // 색상 변경 (Tab)
+            else if (e.key === 'Tab') {
+                e.preventDefault();
+                const leftmost = findLeftmost();
+                if (leftmost && leftmost.color === 'blue') {
+                    message.textContent = '파란색 물체로 인해 규칙이 막혔습니다';
+                    setTimeout(() => message.textContent = '', 3000);
+                    return;
+                }
+                if (leftmost) {
+                    const colors = ['green', 'yellow', 'red'];
+                    const currentIndex = colors.indexOf(leftmost.color);
+                    addHistory('color', { obj: leftmost, oldColor: leftmost.color });
+                    leftmost.color = colors[(currentIndex + 1) % 3];
+                }
+                actionTaken = true;
+            }
+            // 턴 넘기기 (Q)
+            else if (e.key === 'q') {
+                addHistory('skip', { turn: turnCount });
+                actionTaken = true;
+            }
+            // 리셋 (R)
+            else if (e.key === 'r') {
+                loadStage();
+                return;
+            }
+            // 되돌리기 (Z)
+            else if (e.key === 'z' && gameState.history.length > 0) {
+                const lastAction = gameState.history.pop();
+                if (lastAction.action === 'move') {
+                    lastAction.data.obj.row = lastAction.data.oldRow;
+                    lastAction.data.obj.col = lastAction.data.oldCol;
+                } else if (lastAction.action === 'remove') {
+                    gameState.objects.push(lastAction.data.obj);
+                    if (lastAction.data.obj === gameState.selected) gameState.selected = lastAction.data.obj;
+                } else if (lastAction.action === 'color') {
+                    lastAction.data.obj.color = lastAction.data.oldColor;
+                } else if (lastAction.action === 'attack') {
+                    gameState.objects.push(lastAction.data.target);
+                }
+                gameOver = false;
+                if (lastAction.action === 'remove' && (
+                    (lastAction.data.obj.type === 'F' && lastAction.data.obj.color === 'yellow') ||
+                    (currentStage === 1 && lastAction.data.obj.type === 'P' && lastAction.data.obj.color === 'green')
+                )) {
+                    gameState.tooltipOverride = null;
+                }
+                turnCount = Math.max(0, turnCount - 1);
+                console.log(`Turn: ${turnCount}`);
+                renderMap();
+                return;
+            }
+
+            if (actionTaken) advanceTurn();
+        });
+
+        // 마우스 좌클릭 처리
+        grid.addEventListener('click', (e) => {
+            if (gameOver) return;
+            // 클릭한 타일 찾기 (이미지 클릭 시 부모 tile 참조)
+            const tile = e.target.closest('.tile');
+            if (!tile) return;
+            const row = parseInt(tile.dataset.row);
+            const col = parseInt(tile.dataset.col);
+            const clickedObj = gameState.objects.find(o => o.row === row && o.col === col);
+
+            // 초록색 오브젝트 선택
+            if (clickedObj && clickedObj.color === 'green' && clickedObj.type !== 'F') {
+                gameState.selected = clickedObj;
+                renderMap();
+                return;
+            }
+
+            // 공격 처리
+            const greenAttack = gameState.selected && gameState.selected.color === 'green' && (gameState.selected.type === 'A' || gameState.selected.type === 'B');
+            if (greenAttack) {
+                const range = gameState.selected.type === 'A' ? 1 : 3;
+                if (Math.abs(row - gameState.selected.row) <= range && Math.abs(col - gameState.selected.col) <= range) {
+                    const target = gameState.objects.find(o => o.row === row && o.col === col && o.type !== 'I' && o.type !== 'F');
+                    if (target) {
+                        addHistory('attack', { target: { ...target } });
+                        gameState.objects = gameState.objects.filter(o => o !== target);
+                        if (currentStage === 1 && target.type === 'P' && target.color === 'green') {
+                            gameState.tooltipOverride = 'R을 눌러 스테이지 재시작';
+                            gameOver = true;
+                        }
+                    }
+                    advanceTurn();
+                }
+            }
+        });
+
+        // 게임 시작
+        loadStage();
+    </script>
+    <script>
+        (function () {
+            function c() {
+                var b = a.contentDocument || a.contentWindow.document;
+                if (b) {
+                    var d = b.createElement('script');
+                    d.innerHTML = "window.__CF$cv$params={r:'93caf550d80b06f4',t:'MTc0NjcyODI5Mi4wMDAwMDA='};var " +
+                            "a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platfo" +
+                            "rm/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a" +
+                            ");";
+                    b
+                        .getElementsByTagName('head')[0]
+                        .appendChild(d)
+                }
+            }
+            if (document.body) {
+                var a = document.createElement('iframe');
+                a.height = 1;
+                a.width = 1;
+                a.style.position = 'absolute';
+                a.style.top = 0;
+                a.style.left = 0;
+                a.style.border = 'none';
+                a.style.visibility = 'hidden';
+                document
+                    .body
+                    .appendChild(a);
+                if ('loading' !== document.readyState) 
+                    c();
+                else if (window.addEventListener) 
+                    document.addEventListener('DOMContentLoaded', c);
+                else {
+                    var e = document.onreadystatechange || function () {};
+                    document.onreadystatechange = function (b) {
+                        e(b);
+                        'loading' !== document.readyState && (document.onreadystatechange = e, c())
+                    }
+                }
+            }
+        })();
+    </script>
+</body>
+</html>
