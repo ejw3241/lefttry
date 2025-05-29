@@ -28,6 +28,7 @@
             display: inline-block;
             background-color: #080808;
             padding: calc(10px * 1.25);
+            position: relative;
         }
         .grid {
             display: grid;
@@ -49,10 +50,10 @@
             max-height: 100%;
             object-fit: contain;
             z-index: 1;
-            pointer-events: none; /* 이미지 클릭 무시, 부모 tile로 전파 */
+            pointer-events: none;
         }
-        .empty { background-color: #293141; } /* 00 */
-        .floor { background-color: #15181F; } /* -- */
+        .empty { background-color: #293141; }
+        .floor { background-color: #15181F; }
         .floor::before {
             content: '';
             position: absolute;
@@ -70,6 +71,62 @@
         .yellow { background-color: #FFFF00; }
         .red { background-color: #FF0000; }
         .blue { background-color: #0000FF; }
+        
+        /* 추적 상태 시각화 */
+        .tracking {
+            border: 3px solid #ff6600 !important;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { border-color: #ff6600; }
+            50% { border-color: #ffaa00; }
+            100% { border-color: #ff6600; }
+        }
+        
+        /* 공격 이펙트 */
+        .attack-effect-near {
+            position: absolute;
+            background: radial-gradient(circle, rgba(255, 100, 0, 0.9), rgba(255, 0, 0, 0.5), transparent);
+            border-radius: 50%;
+            z-index: 1000;
+            pointer-events: none;
+            animation: explode 1.5s ease-out;
+        }
+        .attack-effect-far {
+            position: absolute;
+            background: linear-gradient(90deg, rgba(255, 0, 0, 0.9), rgba(255, 100, 0, 0.7), transparent);
+            z-index: 1000;
+            pointer-events: none;
+            animation: laser 0.3s ease-out;
+        }
+        .attack-effect-blue-near {
+            position: absolute;
+            background: radial-gradient(circle, rgba(0, 100, 255, 0.9), rgba(0, 0, 255, 0.5), transparent);
+            border-radius: 50%;
+            z-index: 1000;
+            pointer-events: none;
+            animation: explode 1.5s ease-out;
+        }
+        .attack-effect-blue-far {
+            position: absolute;
+            background: linear-gradient(90deg, rgba(0, 0, 255, 0.9), rgba(0, 100, 255, 0.7), transparent);
+            z-index: 1000;
+            pointer-events: none;
+            animation: laser 0.3s ease-out;
+        }
+        
+        @keyframes explode {
+            0% { transform: scale(0.5); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        @keyframes laser {
+            0% { opacity: 1; transform: scaleX(0); }
+            50% { opacity: 1; transform: scaleX(1); }
+            100% { opacity: 0; transform: scaleX(1); }
+        }
+        
         #stage-display {
             font-size: calc(18px * 1.25);
             text-align: center;
@@ -145,7 +202,6 @@
 
     <script>
         // --- 배경음악 설정 ---
-        // 배경음악(BGM)을 로드하고, 첫 키 입력 시 재생
         const bgmUrl = 'Data/music/1. Baba Is You Theme.mp3';
         const bgm = document.getElementById('bgm');
         let bgmLoaded = false;
@@ -163,176 +219,124 @@
             bgm.onended = () => console.log('BGM 재생 종료');
         }
 
-        // --- 타일 및 오브젝트 이미지 매핑 ---
-        // 타일과 오브젝트의 이미지 경로를 정의
-        const tileImages = {
-            //'--': '' // 바닥 타일 이미지
-        };
+        // --- 타일 및 오브젝트 이미지 매핑 (기존 유지) ---
+        const tileImages = {};
         const objectImages = {
-            //'1P': 'Data/sprites/platest.png',   // 초록색 플레이어
-            //'2P': 'Data/sprites/platestY.png',  // 노란색 플레이어
-            //'3P': 'Data/sprites/platestR.png',  // 빨간색 플레이어
-            //'2F': 'Data/sprites/2F.png',        // 노란색 도착점
-            //'2W': 'Data/sprites/2W.png',        // 노란색 벽
-            //'3W': 'Data/sprites/3W.png',        // 빨간색 벽
-            //'1W': 'Data/sprites/1W.png',        // 초록색 벽
-            //'3F': 'Data/sprites/3F.png',        // 빨간색 도착점
-            //'1F': 'Data/sprites/1F.png',        // 초록색 도착점
-            //'3B': 'Data/sprites/eneBtest.png',  // 빨간색 적 (B)
-            //'1B': 'Data/sprites/eneBtestG.png', // 초록색 적 (B)
-            //'2B': 'Data/sprites/eneBtestY.png', // 노란색 적 (B)
-            //'4W': 'Data/sprites/4W.png',        // 파란색 벽
-            //'3A': 'Data/sprites/eneAtest.png',  // 빨간색 적 (A)
-            //'1A': 'Data/sprites/eneAtestG.png', // 초록색 적 (A)
-            //'2A': 'Data/sprites/eneAtestY.png'  // 노란색 적 (A)
-            //--
-            //-- 스프라이트 파일 이름 형식 설명
-            // [색/물체.png] 예시-> 2W.png : 노란색 벽 물체png, 4A.png : 파란색 근거리 공격 물체png.
-            // [색/물체_스트라이프구분/방향.png] 예시 -> 1P_aB.png : 초록색 플레이어 물체의 Bottom쪽을 바라보는 스트라이프a, 1P_bB.png : 초록색 플레이어 물체의 Bottom쪽을 바라보는 스트라이프b, 1P_aT.png : 초록색 플레이어 물체의 Top쪽을 바라보는 스트라이프a
-            // 이동 할 때 마다 스트라이프는 a<->b 계속 변환하여 애니메이션 효과 부여
-            // 방향은 "T, B, L, R" 속성이 존재하며, 각각 "상, 하, 좌, 우" 를 의미
-            // 스트라이프가 존재하는 물체는 "플레이어, 근거리 공격, 원거리 공격"만 존재
-            '1P_aT': 'Data/sprites/1P_aT.png', // 초록색 플레이어 aT
-            '1P_aB': 'Data/sprites/1P_aB.png', // 초록색 플레이어 aB
-            '1P_aL': 'Data/sprites/1P_aL.png', // 초록색 플레이어 aL
-            '1P_aR': 'Data/sprites/1P_aR.png', // 초록색 플레이어 aR
-
-            '1P_bT': 'Data/sprites/1P_bT.png', // 초록색 플레이어 bT
-            '1P_bB': 'Data/sprites/1P_bB.png', // 초록색 플레이어 bB
-            '1P_bL': 'Data/sprites/1P_bL.png', // 초록색 플레이어 bL
-            '1P_bR': 'Data/sprites/1P_bR.png', // 초록색 플레이어 bR
+            '1P_aT': 'Data/sprites/1P_aT.png',
+            '1P_aB': 'Data/sprites/1P_aB.png',
+            '1P_aL': 'Data/sprites/1P_aL.png',
+            '1P_aR': 'Data/sprites/1P_aR.png',
+            '1P_bT': 'Data/sprites/1P_bT.png',
+            '1P_bB': 'Data/sprites/1P_bB.png',
+            '1P_bL': 'Data/sprites/1P_bL.png',
+            '1P_bR': 'Data/sprites/1P_bR.png',
+            '1F': 'Data/sprites/1F.png',
+            '1A_aT': 'Data/sprites/1A_at.png',
+            '1A_aB': 'Data/sprites/1A_aB.png',
+            '1A_aL': 'Data/sprites/1A_aL.png',
+            '1A_aR': 'Data/sprites/1A_aR.png',
+            '1A_bT': 'Data/sprites/1A_bT.png',
+            '1A_bB': 'Data/sprites/1A_bB.png',
+            '1A_bL': 'Data/sprites/1A_bL.png',
+            '1A_bR': 'Data/sprites/1A_bR.png',
+            '1B_aT': 'Data/sprites/1B_at.png',
+            '1B_aB': 'Data/sprites/1B_aB.png',
+            '1B_aL': 'Data/sprites/1B_aL.png',
+            '1B_aR': 'Data/sprites/1B_aR.png',
+            '1B_bT': 'Data/sprites/1B_bT.png',
+            '1B_bB': 'Data/sprites/1B_bB.png',
+            '1B_bL': 'Data/sprites/1B_bL.png',
+            '1B_bR': 'Data/sprites/1B_bR.png',
+            '1W': 'Data/sprites/1W.png',
+            '1I': 'Data/sprites/1I.png',
             
-            '1F': 'Data/sprites/1F.png', // 초록색 도착점
-
-            '1A_aT': 'Data/sprites/1A_at.png', // 초록색 근거리 공격 aT
-            '1A_aB': 'Data/sprites/1A_aB.png', // 초록색 근거리 공격 aB
-            '1A_aL': 'Data/sprites/1A_aL.png', // 초록색 근거리 공격 aL
-            '1A_aR': 'Data/sprites/1A_aR.png', // 초록색 근거리 공격 aR
-
-            '1A_bT': 'Data/sprites/1A_bT.png', // 초록색 근거리 공격 bT
-            '1A_bB': 'Data/sprites/1A_bB.png', // 초록색 근거리 공격 bB
-            '1A_bL': 'Data/sprites/1A_bL.png', // 초록색 근거리 공격 bL
-            '1A_bR': 'Data/sprites/1A_bR.png', // 초록색 근거리 공격 bR
-
-            '1B_aT': 'Data/sprites/1B_at.png', // 초록색 원거리 공격 aT
-            '1B_aB': 'Data/sprites/1B_aB.png', // 초록색 원거리 공격 aB
-            '1B_aL': 'Data/sprites/1B_aL.png', // 초록색 원거리 공격 aL
-            '1B_aR': 'Data/sprites/1B_aR.png', // 초록색 원거리 공격 aR
-
-            '1B_bT': 'Data/sprites/1B_bT.png', // 초록색 원거리 공격 bT
-            '1B_bB': 'Data/sprites/1B_bB.png', // 초록색 원거리 공격 bB
-            '1B_bL': 'Data/sprites/1B_bL.png', // 초록색 원거리 공격 bL
-            '1B_bR': 'Data/sprites/1B_bR.png', // 초록색 원거리 공격 bR
-
-            '1W': 'Data/sprites/1W.png', // 초록색 벽
-            '1I': 'Data/sprites/1I.png', // 초록색 무적 벽
-            //--
-            '2P_aT': 'Data/sprites/2P_aT.png', // 노란색 플레이어 aT
-            '2P_aB': 'Data/sprites/2P_aB.png', // 노란색 플레이어 aB
-            '2P_aL': 'Data/sprites/2P_aL.png', // 노란색 플레이어 aL
-            '2P_aR': 'Data/sprites/2P_aR.png', // 노란색 플레이어 aR
-
-            '2P_bT': 'Data/sprites/2P_bT.png', // 노란색 플레이어 bT
-            '2P_bB': 'Data/sprites/2P_bB.png', // 노란색 플레이어 bB
-            '2P_bL': 'Data/sprites/2P_bL.png', // 노란색 플레이어 bL
-            '2P_bR': 'Data/sprites/2P_bR.png', // 노란색 플레이어 bR
-
-            '2F': 'Data/sprites/2F.png', // 노란색 도착점
-
-            '2A_aT': 'Data/sprites/2A_at.png', // 노란색 근거리 공격 aT
-            '2A_aB': 'Data/sprites/2A_aB.png', // 노란색 근거리 공격 aB
-            '2A_aL': 'Data/sprites/2A_aL.png', // 노란색 근거리 공격 aL
-            '2A_aR': 'Data/sprites/2A_aR.png', // 노란색 근거리 공격 aR
-
-            '2A_bT': 'Data/sprites/2A_bT.png', // 노란색 근거리 공격 bT
-            '2A_bB': 'Data/sprites/2A_bB.png', // 노란색 근거리 공격 bB
-            '2A_bL': 'Data/sprites/2A_bL.png', // 노란색 근거리 공격 bL
-            '2A_bR': 'Data/sprites/2A_bR.png', // 노란색 근거리 공격 bR
-
-            '2B_aT': 'Data/sprites/2B_at.png', // 노란색 원거리 공격 aT
-            '2B_aB': 'Data/sprites/2B_aB.png', // 노란색 원거리 공격 aB
-            '2B_aL': 'Data/sprites/2B_aL.png', // 노란색 원거리 공격 aL
-            '2B_aR': 'Data/sprites/2B_aR.png', // 노란색 원거리 공격 aR
-
-            '2B_bT': 'Data/sprites/2B_bT.png', // 노란색 원거리 공격 bT
-            '2B_bB': 'Data/sprites/2B_bB.png', // 노란색 원거리 공격 bB
-            '2B_bL': 'Data/sprites/2B_bL.png', // 노란색 원거리 공격 bL
-            '2B_bR': 'Data/sprites/2B_bR.png', // 노란색 원거리 공격 bR
-
-            '2W': 'Data/sprites/2W.png', // 노란색 벽
-            '2I': 'Data/sprites/2I.png', // 노란색 무적 벽
-            //--
-            '3P_aT': 'Data/sprites/3P_aT.png', // 빨간색 플레이어 aT
-            '3P_aB': 'Data/sprites/3P_aB.png', // 빨간색 플레이어 aB
-            '3P_aL': 'Data/sprites/3P_aL.png', // 빨간색 플레이어 aL
-            '3P_aR': 'Data/sprites/3P_aR.png', // 빨간색 플레이어 aR
-
-            '3P_bT': 'Data/sprites/3P_bT.png', // 빨간색 플레이어 bT
-            '3P_bB': 'Data/sprites/3P_bB.png', // 빨간색 플레이어 bB
-            '3P_bL': 'Data/sprites/3P_bL.png', // 빨간색 플레이어 bL
-            '3P_bR': 'Data/sprites/3P_bR.png', // 빨간색 플레이어 bR
-
-            '3F': 'Data/sprites/3F.png', // 빨간색 도착점
-
-            '3A_aT': 'Data/sprites/3A_at.png', // 빨간색 근거리 공격 aT
-            '3A_aB': 'Data/sprites/3A_aB.png', // 빨간색 근거리 공격 aB
-            '3A_aL': 'Data/sprites/3A_aL.png', // 빨간색 근거리 공격 aL
-            '3A_aR': 'Data/sprites/3A_aR.png', // 빨간색 근거리 공격 aR
-
-            '3A_bT': 'Data/sprites/3A_bT.png', // 빨간색 근거리 공격 bT
-            '3A_bB': 'Data/sprites/3A_bB.png', // 빨간색 근거리 공격 bB
-            '3A_bL': 'Data/sprites/3A_bL.png', // 빨간색 근거리 공격 bL
-            '3A_bR': 'Data/sprites/3A_bR.png', // 빨간색 근거리 공격 bR
-
-            '3B_aT': 'Data/sprites/3B_at.png', // 빨간색 원거리 공격 aT
-            '3B_aB': 'Data/sprites/3B_aB.png', // 빨간색 원거리 공격 aB
-            '3B_aL': 'Data/sprites/3B_aL.png', // 빨간색 원거리 공격 aL
-            '3B_aR': 'Data/sprites/3B_aR.png', // 빨간색 원거리 공격 aR
-
-            '3B_bT': 'Data/sprites/3B_bT.png', // 빨간색 원거리 공격 bT
-            '3B_bB': 'Data/sprites/3B_bB.png', // 빨간색 원거리 공격 bB
-            '3B_bL': 'Data/sprites/3B_bL.png', // 빨간색 원거리 공격 bL
-            '3B_bR': 'Data/sprites/3B_bR.png', // 빨간색 원거리 공격 bR
-
-            '3W': 'Data/sprites/3W.png', // 빨간색 벽
-            '3I': 'Data/sprites/3I.png', // 빨간색 무적 벽
-            //--
-            '4A_aT': 'Data/sprites/4A_at.png', // 파란색 근거리 공격 aT
-            '4A_aB': 'Data/sprites/4A_aB.png', // 파란색 근거리 공격 aB
-            '4A_aL': 'Data/sprites/4A_aL.png', // 파란색 근거리 공격 aL
-            '4A_aR': 'Data/sprites/4A_aR.png', // 파란색 근거리 공격 aR
-
-            '4A_bT': 'Data/sprites/4A_bT.png', // 파란색 근거리 공격 bT
-            '4A_bB': 'Data/sprites/4A_bB.png', // 파란색 근거리 공격 bB
-            '4A_bL': 'Data/sprites/4A_bL.png', // 파란색 근거리 공격 bL
-            '4A_bR': 'Data/sprites/4A_bR.png', // 파란색 근거리 공격 bR
-
-            '4B_aT': 'Data/sprites/4B_at.png', // 파란색 원거리 공격 aT
-            '4B_aB': 'Data/sprites/4B_aB.png', // 파란색 원거리 공격 aB
-            '4B_aL': 'Data/sprites/4B_aL.png', // 파란색 원거리 공격 aL
-            '4B_aR': 'Data/sprites/4B_aR.png', // 파란색 원거리 공격 aR
-
-            '4B_bT': 'Data/sprites/4B_bT.png', // 파란색 원거리 공격 bT
-            '4B_bB': 'Data/sprites/4B_bB.png', // 파란색 원거리 공격 bB
-            '4B_bL': 'Data/sprites/4B_bL.png', // 파란색 원거리 공격 bL
-            '4B_bR': 'Data/sprites/4B_bR.png', // 파란색 원거리 공격 bR
-
-            '4W': 'Data/sprites/4W.png', // 파란색 벽
-            '4I': 'Data/sprites/4I.png', // 파란색 무적 벽
+            '2P_aT': 'Data/sprites/2P_aT.png',
+            '2P_aB': 'Data/sprites/2P_aB.png',
+            '2P_aL': 'Data/sprites/2P_aL.png',
+            '2P_aR': 'Data/sprites/2P_aR.png',
+            '2P_bT': 'Data/sprites/2P_bT.png',
+            '2P_bB': 'Data/sprites/2P_bB.png',
+            '2P_bL': 'Data/sprites/2P_bL.png',
+            '2P_bR': 'Data/sprites/2P_bR.png',
+            '2F': 'Data/sprites/2F.png',
+            '2A_aT': 'Data/sprites/2A_at.png',
+            '2A_aB': 'Data/sprites/2A_aB.png',
+            '2A_aL': 'Data/sprites/2A_aL.png',
+            '2A_aR': 'Data/sprites/2A_aR.png',
+            '2A_bT': 'Data/sprites/2A_bT.png',
+            '2A_bB': 'Data/sprites/2A_bB.png',
+            '2A_bL': 'Data/sprites/2A_bL.png',
+            '2A_bR': 'Data/sprites/2A_bR.png',
+            '2B_aT': 'Data/sprites/2B_at.png',
+            '2B_aB': 'Data/sprites/2B_aB.png',
+            '2B_aL': 'Data/sprites/2B_aL.png',
+            '2B_aR': 'Data/sprites/2B_aR.png',
+            '2B_bT': 'Data/sprites/2B_bT.png',
+            '2B_bB': 'Data/sprites/2B_bB.png',
+            '2B_bL': 'Data/sprites/2B_bL.png',
+            '2B_bR': 'Data/sprites/2B_bR.png',
+            '2W': 'Data/sprites/2W.png',
+            '2I': 'Data/sprites/2I.png',
+            
+            '3P_aT': 'Data/sprites/3P_aT.png',
+            '3P_aB': 'Data/sprites/3P_aB.png',
+            '3P_aL': 'Data/sprites/3P_aL.png',
+            '3P_aR': 'Data/sprites/3P_aR.png',
+            '3P_bT': 'Data/sprites/3P_bT.png',
+            '3P_bB': 'Data/sprites/3P_bB.png',
+            '3P_bL': 'Data/sprites/3P_bL.png',
+            '3P_bR': 'Data/sprites/3P_bR.png',
+            '3F': 'Data/sprites/3F.png',
+            '3A_aT': 'Data/sprites/3A_at.png',
+            '3A_aB': 'Data/sprites/3A_aB.png',
+            '3A_aL': 'Data/sprites/3A_aL.png',
+            '3A_aR': 'Data/sprites/3A_aR.png',
+            '3A_bT': 'Data/sprites/3A_bT.png',
+            '3A_bB': 'Data/sprites/3A_bB.png',
+            '3A_bL': 'Data/sprites/3A_bL.png',
+            '3A_bR': 'Data/sprites/3A_bR.png',
+            '3B_aT': 'Data/sprites/3B_at.png',
+            '3B_aB': 'Data/sprites/3B_aB.png',
+            '3B_aL': 'Data/sprites/3B_aL.png',
+            '3B_aR': 'Data/sprites/3B_aR.png',
+            '3B_bT': 'Data/sprites/3B_bT.png',
+            '3B_bB': 'Data/sprites/3B_bB.png',
+            '3B_bL': 'Data/sprites/3B_bL.png',
+            '3B_bR': 'Data/sprites/3B_bR.png',
+            '3W': 'Data/sprites/3W.png',
+            '3I': 'Data/sprites/3I.png',
+            
+            '4A_aT': 'Data/sprites/4A_at.png',
+            '4A_aB': 'Data/sprites/4A_aB.png',
+            '4A_aL': 'Data/sprites/4A_aL.png',
+            '4A_aR': 'Data/sprites/4A_aR.png',
+            '4A_bT': 'Data/sprites/4A_bT.png',
+            '4A_bB': 'Data/sprites/4A_bB.png',
+            '4A_bL': 'Data/sprites/4A_bL.png',
+            '4A_bR': 'Data/sprites/4A_bR.png',
+            '4B_aT': 'Data/sprites/4B_at.png',
+            '4B_aB': 'Data/sprites/4B_aB.png',
+            '4B_aL': 'Data/sprites/4B_aL.png',
+            '4B_aR': 'Data/sprites/4B_aR.png',
+            '4B_bT': 'Data/sprites/4B_bT.png',
+            '4B_bB': 'Data/sprites/4B_bB.png',
+            '4B_bL': 'Data/sprites/4B_bL.png',
+            '4B_bR': 'Data/sprites/4B_bR.png',
+            '4W': 'Data/sprites/4W.png',
+            '4I': 'Data/sprites/4I.png',
         };
 
-        // --- 스테이지 데이터 ---
-        // 각 스테이지의 맵과 툴팁 정의
+        // --- 스테이지 데이터 (기존 유지) ---
         const stages = [
             {
                 map: [
                     ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '1P', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
                     ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
                     ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
                     ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
-                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
-                    ['--', '--', '--', '--', '--', '2I', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
-                    ['--', '00', '00', '3A', '00', '--', '--', '--', '--', '00', '1P', '--', '--', '--', '--', '3B', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '00', '--', '2I', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '00', '--', '3A', '00', '--', '--', '--', '--', '00', '00', '--', '--', '--', '--', '3B', '--', '--', '--', '--', '--'],
                     ['--', '--', '--', '--', '00', '--', '--', '--', '--', '00', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
                     ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
                     ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
@@ -341,8 +345,9 @@
                     ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '2F', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--']
                 ],
                 tooltip: [
-                    'P-1 Stage.',
-                    'Test A, B'
+                    'AI 테스트 스테이지 - 빨간색 근거리(3A)와 원거리(3B) 공격 물체가 추적합니다.',
+                    '3A는 A* 경로탐색으로 접근하고, 3B는 2턴마다 원거리 공격합니다.',
+                    '추적 중인 AI는 주황색 테두리로 표시됩니다.'
                 ]
             },
             {
@@ -354,7 +359,6 @@
                 tooltip: [
                     '초록색 플레이어가 노란색 도착점에 닿으면 레벨이 클리어 됩니다.',
                     'W, A, S, D로 이동합니다'
-                    // 챕터 0 - 스테이지 1 (튜토리얼)
                 ]
             },
             {
@@ -368,7 +372,6 @@
                 tooltip: [
                     '모든 규칙은 왼쪽부터 적용됩니다.',
                     '"SPACE"키로 물체를 부술 수 있습니다.'
-                    // 챕터 0 - 스테이지 2 (튜토리얼)
                 ]
             },
             {
@@ -381,7 +384,6 @@
                     '모든 규칙은 왼쪽부터 적용됩니다.',
                     '"TAP"키로 물체의 색을 바꿀 수 있습니다.',
                     '바뀌는 순서는 초록 > 노랑 > 빨강 순서입니다.'
-                    // 챕터 0 - 스테이지 3 (튜토리얼)
                 ]
             },
             {
@@ -396,7 +398,6 @@
                 ],
                 tooltip: [
                     '빨간색 물체는 당신을 공격하는 적입니다.'
-                    // 챕터 0 - 스테이지 4 (튜토리얼)
                 ]
             },
             {
@@ -415,7 +416,6 @@
                     ' ',
                     '마우스 좌클릭으로 물체를 부술 수 있습니다. (공격 가능 물체만)',
                     '마우스 좌클릭으로 어떤 물체를 조작할지 선택할 수 있습니다.'
-                    // 챕터 0 - 스테이지 5 (튜토리얼)
                 ]
             },
             {
@@ -429,7 +429,6 @@
                 ],
                 tooltip: [
                     'insert tooltip here', '(8, 2)2W 이동 로직 만들고 나면 넣기.'
-                    // 챕터 1 - 스테이지 1
                 ]
             },
             {
@@ -446,7 +445,6 @@
                 ],
                 tooltip: [
                     'insert tooltip here'
-                    // 챕터 1 - 스테이지 2
                 ]
             },
             {
@@ -459,7 +457,6 @@
                 ],
                 tooltip: [
                     'insert tooltip here'
-                    // 챕터 1 - 스테이지 3
                 ]
             },
             {
@@ -474,7 +471,6 @@
                 ],
                 tooltip: [
                     'insert tooltip here', '(5,3) 4W, 3A의 어그로 이동 로직 만들고 나면 넣기'
-                    // 챕터 1 - 스테이지 4
                 ]
             },
             {
@@ -489,47 +485,312 @@
                 ],
                 tooltip: [
                     'insert tooltip here'
-                    // 챕터 1 - 스테이지 5
                 ]
             }
         ];
 
         // --- 게임 상태 변수 ---
-        // 게임 진행에 필요한 전역 상태 관리
-        let currentStage = 0; // 현재 스테이지 인덱스
-        let turnCount = 0; // 현재 턴 수
+        let currentStage = 0;
+        let turnCount = 0;
+        let nextObjectId = 1;
         let gameState = {
-            selected: null, // 현재 선택된 오브젝트
-            objects: [], // 맵 상의 오브젝트 목록
-            history: [], // 행동 히스토리 (되돌리기용)
-            tooltipOverride: null // 툴팁 오버라이드 메시지
+            selected: null,
+            objects: [],
+            history: [],
+            tooltipOverride: null
         };
-        let gameOver = false; // 게임 오버 여부
+        let gameOver = false;
         const grid = document.getElementById('grid');
         const message = document.getElementById('message');
         const tooltip = document.getElementById('tooltip');
         const stageDisplay = document.getElementById('stage-display');
         const clearMessage = document.getElementById('clear-message');
-        const MAX_HISTORY = 100; // 최대 히스토리 저장 개수
+        const MAX_HISTORY = 512;
+
+        // --- A* 경로탐색 알고리즘 ---
+        function findPathAStar(startRow, startCol, targetRow, targetCol, mapData, alliedColors) {
+            const rows = mapData.length;
+            const cols = mapData[0].length;
+            
+            function heuristic(row, col) {
+                return Math.abs(row - targetRow) + Math.abs(col - targetCol);
+            }
+            
+            function isValidMove(row, col) {
+                if (row < 0 || row >= rows || col < 0 || col >= cols) return false;
+                if (mapData[row][col] === '00') return false;
+                
+                const obj = gameState.objects.find(o => o.row === row && o.col === col);
+                if (obj) {
+                    if (row === targetRow && col === targetCol) return true;
+                    return alliedColors.includes(obj.color);
+                }
+                return true;
+            }
+            
+            const openSet = [{ row: startRow, col: startCol, g: 0, h: heuristic(startRow, startCol), f: heuristic(startRow, startCol), parent: null }];
+            const closedSet = new Set();
+            
+            while (openSet.length > 0) {
+                openSet.sort((a, b) => a.f - b.f);
+                const current = openSet.shift();
+                const key = `${current.row},${current.col}`;
+                
+                if (closedSet.has(key)) continue;
+                closedSet.add(key);
+                
+                if (current.row === targetRow && current.col === targetCol) {
+                    const path = [];
+                    let node = current;
+                    while (node) {
+                        path.unshift({ row: node.row, col: node.col });
+                        node = node.parent;
+                    }
+                    return path;
+                }
+                
+                const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+                for (const [dr, dc] of directions) {
+                    const newRow = current.row + dr;
+                    const newCol = current.col + dc;
+                    const newKey = `${newRow},${newCol}`;
+                    
+                    if (closedSet.has(newKey) || !isValidMove(newRow, newCol)) continue;
+                    
+                    const g = current.g + 1;
+                    const h = heuristic(newRow, newCol);
+                    const f = g + h;
+                    
+                    const existing = openSet.find(node => node.row === newRow && node.col === newCol);
+                    if (!existing || g < existing.g) {
+                        if (existing) {
+                            existing.g = g;
+                            existing.f = f;
+                            existing.parent = current;
+                        } else {
+                            openSet.push({ row: newRow, col: newCol, g, h, f, parent: current });
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        // --- 공격 이펙트 생성 ---
+        function createAttackEffect(targetRow, targetCol, attackType, attackerColor = 'red') {
+            const gameContainer = document.getElementById('game-container');
+            const tile = grid.querySelector(`.tile[data-row='${targetRow}'][data-col='${targetCol}']`);
+            if (!tile || !gameContainer) return;
+
+            const tileRect = tile.getBoundingClientRect();
+            const containerRect = gameContainer.getBoundingClientRect();
+
+            const effectElement = document.createElement('div');
+            const colorSuffix = attackerColor === 'blue' ? '-blue' : '';
+            effectElement.className = attackType === 'near' ? `attack-effect${colorSuffix}-near` : `attack-effect${colorSuffix}-far`;
+            
+            effectElement.style.position = 'absolute';
+            effectElement.style.left = `${tileRect.left - containerRect.left}px`;
+            effectElement.style.top = `${tileRect.top - containerRect.top}px`;
+            
+            if (attackType === 'near') {
+                effectElement.style.width = `${tileRect.width * 2}px`;
+                effectElement.style.height = `${tileRect.height * 2}px`;
+                effectElement.style.transform = 'translate(-25%, -25%)';
+            } else {
+                effectElement.style.width = `${tileRect.width}px`;
+                effectElement.style.height = `${tileRect.height / 4}px`;
+                effectElement.style.top = `${tileRect.top - containerRect.top + tileRect.height * 0.375}px`;
+            }
+            
+            gameContainer.appendChild(effectElement);
+
+            setTimeout(() => {
+                if (effectElement.parentNode) effectElement.remove();
+            }, attackType === 'near' ? 1500 : 300);
+        }
+
+        // --- AI 시스템 ---
+        function processEnemyNearRange(obj) {
+            let currentTarget = gameState.objects.find(o => o.id === obj.targetId);
+
+            // 인식 해제 조건 확인
+            if (currentTarget && (!isObjectPresent(currentTarget) || currentTarget.color !== 'green')) {
+                obj.targetId = null;
+                currentTarget = null;
+                obj.isTracking = false;
+            }
+
+            // 새로운 타겟 탐색
+            if (!obj.targetId) {
+                const greenObjs = gameState.objects.filter(g =>
+                    g.color === 'green' &&
+                    Math.abs(g.row - obj.row) <= 2 && // 5x5 인식 범위
+                    Math.abs(g.col - obj.col) <= 2
+                );
+
+                if (greenObjs.length > 0) {
+                    greenObjs.sort((a, b) => {
+                        const distA = Math.abs(a.row - obj.row) + Math.abs(a.col - obj.col);
+                        const distB = Math.abs(b.row - obj.row) + Math.abs(b.col - obj.col);
+                        if (distA !== distB) return distA - distB;
+                        if (a.col !== b.col) return a.col - b.col;
+                        return a.row - b.row;
+                    });
+                    obj.targetId = greenObjs[0].id;
+                    currentTarget = greenObjs[0];
+                    obj.isTracking = true;
+                    addHistory('aiTargetChange', { objId: obj.id, targetId: obj.targetId });
+                } else {
+                    obj.isTracking = false;
+                    return;
+                }
+            }
+
+            // 타겟 확정 후 처리
+            if (obj.isTracking && currentTarget) {
+                // 공격 범위 확인 및 공격
+                if (Math.abs(currentTarget.row - obj.row) <= 1 && Math.abs(currentTarget.col - obj.col) <= 1) {
+                    addHistory('attack', { attacker: { id: obj.id, type: obj.type }, target: { ...currentTarget } });
+                    gameState.objects = gameState.objects.filter(o => o.id !== currentTarget.id);
+                    createAttackEffect(currentTarget.row, currentTarget.col, 'near', obj.color);
+                    obj.targetId = null;
+                    obj.isTracking = false;
+                    
+                    if (currentTarget === gameState.selected) gameState.selected = null;
+                    if (currentTarget.type === 'P' && currentTarget.color === 'green') {
+                        gameOver = true;
+                        gameState.tooltipOverride = 'R을 눌러 스테이지 재시작';
+                    }
+                    return;
+                }
+
+                // 이동 (원래 동맹 관계)
+                let alliedColors = obj.color === 'red' ? ['red', 'yellow', 'blue'] : ['blue', 'yellow'];
+                const path = findPathAStar(obj.row, obj.col, currentTarget.row, currentTarget.col, stages[currentStage].map, alliedColors);
+
+                if (path && path.length > 1) {
+                    addHistory('enemyMove', { objId: obj.id, oldRow: obj.row, oldCol: obj.col, newRow: path[1].row, newCol: path[1].col });
+                    
+                    // 이동 방향 계산 및 스프라이트 업데이트
+                    const deltaRow = path[1].row - obj.row;
+                    const deltaCol = path[1].col - obj.col;
+                    let direction = 'B'; // 기본값
+                    if (deltaRow < 0) direction = 'T';
+                    else if (deltaRow > 0) direction = 'B';
+                    else if (deltaCol < 0) direction = 'L';
+                    else if (deltaCol > 0) direction = 'R';
+                    
+                    obj.row = path[1].row;
+                    obj.col = path[1].col;
+                    updateSprite(obj, 'move', direction);
+                }
+            }
+        }
+
+        function processEnemyLongRange(obj) {
+            let currentTarget = gameState.objects.find(o => o.id === obj.targetId);
+
+            // 인식 해제 조건 확인
+            if (currentTarget && (!isObjectPresent(currentTarget) || currentTarget.color !== 'green')) {
+                obj.targetId = null;
+                currentTarget = null;
+                obj.lastAttackTurn = null;
+                obj.isTracking = false;
+            }
+
+            // 새로운 타겟 탐색
+            if (!obj.targetId) {
+                const greenObjs = gameState.objects.filter(g =>
+                    g.color === 'green' &&
+                    Math.abs(g.row - obj.row) <= 3 && // 7x7 인식 범위
+                    Math.abs(g.col - obj.col) <= 3
+                );
+
+                if (greenObjs.length > 0) {
+                    greenObjs.sort((a, b) => {
+                        const distA = Math.abs(a.row - obj.row) + Math.abs(a.col - obj.col);
+                        const distB = Math.abs(b.row - obj.row) + Math.abs(b.col - obj.col);
+                        if (distA !== distB) return distA - distB;
+                        if (a.col !== b.col) return a.col - b.col;
+                        return a.row - b.row;
+                    });
+                    obj.targetId = greenObjs[0].id;
+                    currentTarget = greenObjs[0];
+                    obj.lastAttackTurn = turnCount;
+                    obj.isTracking = true;
+                    
+                    // 타겟 방향으로 스프라이트 업데이트
+                    const deltaRow = currentTarget.row - obj.row;
+                    const deltaCol = currentTarget.col - obj.col;
+                    let direction = 'B';
+                    if (Math.abs(deltaRow) > Math.abs(deltaCol)) {
+                        direction = deltaRow < 0 ? 'T' : 'B';
+                    } else {
+                        direction = deltaCol < 0 ? 'L' : 'R';
+                    }
+                    updateSprite(obj, 'aim', direction);
+                    
+                    addHistory('aiTargetChange', { objId: obj.id, targetId: obj.targetId });
+                } else {
+                    obj.isTracking = false;
+                    return;
+                }
+            }
+
+            // 타겟 확정 후 공격
+            if (obj.isTracking && currentTarget) {
+                if (Math.abs(currentTarget.row - obj.row) <= 3 && Math.abs(currentTarget.col - obj.col) <= 3) {
+                    if ((turnCount - obj.lastAttackTurn) >= 2) {
+                        addHistory('attack', { attacker: { id: obj.id, type: obj.type }, target: { ...currentTarget } });
+                        gameState.objects = gameState.objects.filter(o => o.id !== currentTarget.id);
+                        createAttackEffect(currentTarget.row, currentTarget.col, 'far', obj.color);
+                        obj.targetId = null;
+                        obj.lastAttackTurn = null;
+                        obj.isTracking = false;
+                        
+                        if (currentTarget === gameState.selected) gameState.selected = null;
+                        if (currentTarget.type === 'P' && currentTarget.color === 'green') {
+                            gameOver = true;
+                            gameState.tooltipOverride = 'R을 눌러 스테이지 재시작';
+                        }
+                    }
+                }
+            }
+        }
+
+        function isObjectPresent(obj) {
+            return gameState.objects.some(o => o.id === obj.id);
+        }
 
         // --- 게임 로직 함수 ---
-
-        // loadStage: 스테이지 데이터를 로드하고 초기화
         function loadStage() {
             const stage = stages[currentStage];
             gameState.objects = [];
-            // 맵에서 오브젝트 추출 (00: 빈칸, --: 바닥 제외)
+            nextObjectId = 1;
+            
             for (let row = 0; row < stage.map.length; row++) {
                 for (let col = 0; col < stage.map[0].length; col++) {
                     const code = stage.map[row][col];
                     if (code !== '00' && code !== '--') {
-                        const type = code.slice(1); // 오브젝트 타입 (P, F, W 등)
+                        const type = code.slice(1);
                         const color = code[0] === '1' ? 'green' : code[0] === '2' ? 'yellow' : code[0] === '3' ? 'red' : 'blue';
-                        gameState.objects.push({ row, col, type, color });
+                        gameState.objects.push({ 
+                            id: nextObjectId++,
+                            row, 
+                            col, 
+                            type, 
+                            color,
+                            targetId: null,
+                            isTracking: false,
+                            lastAttackTurn: null,
+                            spriteState: 'a',
+                            direction: 'B'
+                        });
                     }
                 }
             }
-            // 초록색 플레이어(1P)를 기본 선택
+            
             gameState.selected = gameState.objects.find(o => o.type === 'P' && o.color === 'green');
             turnCount = 0;
             gameOver = false;
@@ -539,119 +800,145 @@
             renderMap();
         }
 
-        // renderMap: 맵과 UI를 렌더링
         function renderMap() {
             const stage = stages[currentStage];
-            // 그리드 크기 동적 설정
             grid.style.gridTemplateColumns = `repeat(${stage.map[0].length}, calc(40px * 1.25))`;
             grid.style.gridTemplateRows = `repeat(${stage.map.length}, calc(40px * 1.25))`;
             grid.innerHTML = '';
 
-            // 맵 타일 생성
             for (let row = 0; row < stage.map.length; row++) {
                 for (let col = 0; col < stage.map[0].length; col++) {
                     const tile = document.createElement('div');
                     tile.classList.add('tile');
                     tile.classList.add(stage.map[row][col] === '00' ? 'empty' : 'floor');
 
-                    // 오브젝트 렌더링
                     const obj = gameState.objects.find(o => o.row === row && o.col === col);
                     if (obj) {
                         const objCode = `${obj.color === 'green' ? '1' : obj.color === 'yellow' ? '2' : obj.color === 'red' ? '3' : '4'}${obj.type}`;
-                        if (objectImages[objCode]) {
+                        
+                        // 스프라이트 애니메이션 지원 (수정됨)
+                        let imageKey = objCode;
+                        if (['P', 'A', 'B'].includes(obj.type)) {
+                            imageKey = `${objCode}_${obj.spriteState}${obj.direction}`;
+                        }
+                        
+                        if (objectImages[imageKey]) {
                             const img = document.createElement('img');
-                            img.src = objectImages[objCode];
+                            img.src = objectImages[imageKey];
                             img.alt = obj.type;
                             img.onerror = () => {
                                 tile.classList.add(obj.color);
-                                tile.textContent = obj.type; // 이미지 로드 실패 시 색상+텍스트 대체
+                                tile.textContent = obj.type;
                             };
                             tile.appendChild(img);
                         } else {
                             tile.classList.add(obj.color);
                             tile.textContent = obj.type;
                         }
-                        // 선택된 오브젝트 표시
-                        if (gameState.selected && gameState.selected.row === row && gameState.selected.col === col) {
+                        
+                        // 추적 중인 AI 시각화
+                        if (obj.isTracking && (obj.type === 'A' || obj.type === 'B') && (obj.color === 'red' || obj.color === 'blue')) {
+                            tile.classList.add('tracking');
+                        }
+                        
+                        if (gameState.selected && gameState.selected.id === obj.id) {
                             tile.style.border = '2px solid #fff';
                         }
                     }
+                    
                     tile.dataset.row = row;
                     tile.dataset.col = col;
                     grid.appendChild(tile);
                 }
             }
-            // 메시지 및 UI 업데이트
+            
             message.textContent = gameOver ? 'Z: 한 칸 되돌리기, R: 스테이지 초기화 하기' : '';
             stageDisplay.textContent = `Stage: ${currentStage + 1}`;
             const tooltipText = gameState.tooltipOverride ? [gameState.tooltipOverride] : stage.tooltip;
             tooltip.innerHTML = tooltipText.map(line => `<p>${line}</p>`).join('');
         }
 
-        // canMove: 오브젝트 이동 가능 여부 확인
         function canMove(row, col, movingObj) {
             const stage = stages[currentStage];
-            // 맵 범위 및 빈칸(00) 체크
             if (row < 0 || row >= stage.map.length || col < 0 || col >= stage.map[0].length || stage.map[row][col] === '00') {
                 return false;
             }
-            // 타겟 위치의 오브젝트 체크
             const obj = gameState.objects.find(o => o.row === row && o.col === col);
             if (obj) {
-                // 1P와 2F 겹침 허용
                 return obj.type === 'F' && obj.color === 'yellow' && movingObj.type === 'P' && movingObj.color === 'green';
             }
             return true;
         }
 
-        // addHistory: 행동을 히스토리에 저장 (되돌리기용)
         function addHistory(action, data) {
-            gameState.history.push({ action, data });
+            const relevantAiStates = gameState.objects
+                .filter(o => ['A', 'B'].includes(o.type) && ['red', 'blue'].includes(o.color))
+                .map(o => ({
+                    id: o.id,
+                    isTracking: o.isTracking,
+                    targetId: o.targetId,
+                    lastAttackTurn: o.lastAttackTurn
+                }));
+
+            gameState.history.push({
+                action,
+                data,
+                state: {
+                    objects: JSON.parse(JSON.stringify(gameState.objects)),
+                    aiStates: relevantAiStates,
+                    turnCount: turnCount,
+                    currentSelectedObjectId: gameState.selected ? gameState.selected.id : null
+                }
+            });
+            
             if (gameState.history.length > MAX_HISTORY) {
-                gameState.history.shift(); // 최대 히스토리 초과 시 오래된 항목 제거
+                gameState.history.shift();
             }
         }
 
-        // advanceTurn: 턴 진행 및 적 행동 처리
         function advanceTurn() {
             if (gameOver) return;
             turnCount++;
             console.log(`Turn: ${turnCount}`);
 
-            // 빨간색 적(3B)의 공격 로직
+            // AI 처리
             gameState.objects.forEach(obj => {
-                if (obj.color === 'red' && obj.type === 'B') {
-                    const range = 3; // 공격 범위 (7x7)
+                if ((obj.type === 'A') && (obj.color === 'red' || obj.color === 'blue')) {
+                    processEnemyNearRange(obj);
+                } else if ((obj.type === 'B') && (obj.color === 'red' || obj.color === 'blue')) {
+                    processEnemyLongRange(obj);
+                }
+            });
+
+            // 기존 3B 공격 로직 (호환성 유지)
+            gameState.objects.forEach(obj => {
+                if (obj.color === 'red' && obj.type === 'B' && !obj.hasOwnProperty('targetId')) {
+                    const range = 3;
                     const greenObjs = gameState.objects.filter(o => o.color === 'green');
-                    // 초록색 오브젝트를 순회하며 공격 대상 확인
                     greenObjs.forEach(green => {
-                        // 범위 내 타겟 체크
                         if (Math.abs(green.row - obj.row) <= range && Math.abs(green.col - obj.col) <= range) {
-                            obj.moving = true; // 공격 상태 표시
-                            // 2턴 마다 공격 실행
+                            obj.moving = true;
                             if (turnCount % 2 === 0) {
-                                // 공격 애니메이션 적용
                                 const tile = grid.querySelector(`.tile[data-row="${green.row}"][data-col="${green.col}"]`);
                                 if (tile) {
                                     tile.classList.add('attack-effect');
                                     setTimeout(() => tile.classList.remove('attack-effect'), 500);
                                 }
-                                // 타겟 제거 및 히스토리 저장
                                 addHistory('attack', { target: { ...green } });
-                                gameState.objects = gameState.objects.filter(o => o !== green);
+                                gameState.objects = gameState.objects.filter(o => o.id !== green.id);
                                 if (green === gameState.selected) gameState.selected = null;
-                                gameOver = true; // 게임 오버 설정
+                                gameOver = true;
                             }
                         } else {
-                            obj.moving = false; // 공격 대상 없으면 비활성화
+                            obj.moving = false;
                         }
                     });
                 }
             });
+
             renderMap();
         }
 
-        // findLeftmost: 가장 왼쪽 오브젝트 찾기
         function findLeftmost() {
             let leftmost = null;
             gameState.objects.forEach(obj => {
@@ -662,11 +949,23 @@
             return leftmost;
         }
 
-        // --- 이벤트 리스너 ---
+        function updateSprite(obj, action, direction) {
+            // 스프라이트 애니메이션 지원 확장 (수정됨)
+            if (!['P', 'A', 'B'].includes(obj.type)) return;
+            
+            if (direction) {
+                const dirMap = { 'w': 'T', 's': 'B', 'a': 'L', 'd': 'R', 'T': 'T', 'B': 'B', 'L': 'L', 'R': 'R' };
+                obj.direction = dirMap[direction] || obj.direction;
+            }
+            
+            if (action === 'move' || action === 'aim') {
+                obj.spriteState = obj.spriteState === 'a' ? 'b' : 'a';
+            }
+        }
 
-        // 키 입력 처리
+        // --- 이벤트 리스너 ---
         document.addEventListener('keydown', (e) => {
-            // BGM 재생 (첫 키 입력 시)
+            // BGM 재생
             if (bgmLoaded && bgm.paused) {
                 console.log('Attempting to play BGM on keydown');
                 bgm.play().then(() => console.log('BGM 재생 시작:', bgmUrl))
@@ -684,6 +983,7 @@
                 else if (e.key === 's') newPos.row++;
                 else if (e.key === 'a') newPos.col--;
                 else if (e.key === 'd') newPos.col++;
+                
                 if (canMove(newPos.row, newPos.col, gameState.selected)) {
                     addHistory('move', {
                         obj: gameState.selected,
@@ -692,7 +992,9 @@
                     });
                     gameState.selected.row = newPos.row;
                     gameState.selected.col = newPos.col;
+                    updateSprite(gameState.selected, 'move', e.key);
                     actionTaken = true;
+                    
                     // 클리어 조건 체크
                     if (gameState.selected.type === 'P' && gameState.objects.some(o => o.row === newPos.row && o.col === newPos.col && o.type === 'F' && o.color === 'yellow')) {
                         currentStage++;
@@ -718,9 +1020,10 @@
                 }
                 if (leftmost) {
                     addHistory('remove', { obj: { ...leftmost } });
-                    gameState.objects = gameState.objects.filter(o => o !== leftmost);
-                    if (leftmost === gameState.selected) gameState.selected = gameState.objects.find(o => o.color === 'green' && o.type !== 'F') || null;
-                    // 게임 오버 조건
+                    gameState.objects = gameState.objects.filter(o => o.id !== leftmost.id);
+                    if (leftmost === gameState.selected) {
+                        gameState.selected = gameState.objects.find(o => o.color === 'green' && o.type !== 'F') || null;
+                    }
                     if (leftmost.type === 'F' && leftmost.color === 'yellow') {
                         gameState.tooltipOverride = 'R을 눌러 스테이지 재시작';
                         gameOver = true;
@@ -761,26 +1064,25 @@
             }
             // 되돌리기 (Z)
             else if (e.key === 'z' && gameState.history.length > 0) {
-                const lastAction = gameState.history.pop();
-                if (lastAction.action === 'move') {
-                    lastAction.data.obj.row = lastAction.data.oldRow;
-                    lastAction.data.obj.col = lastAction.data.oldCol;
-                } else if (lastAction.action === 'remove') {
-                    gameState.objects.push(lastAction.data.obj);
-                    if (lastAction.data.obj === gameState.selected) gameState.selected = lastAction.data.obj;
-                } else if (lastAction.action === 'color') {
-                    lastAction.data.obj.color = lastAction.data.oldColor;
-                } else if (lastAction.action === 'attack') {
-                    gameState.objects.push(lastAction.data.target);
-                }
+                const lastStateSnapshot = gameState.history.pop().state;
+
+                gameState.objects = JSON.parse(JSON.stringify(lastStateSnapshot.objects));
+                lastStateSnapshot.aiStates.forEach(savedAiState => {
+                    const gameObj = gameState.objects.find(o => o.id === savedAiState.id);
+                    if (gameObj) {
+                        gameObj.isTracking = savedAiState.isTracking;
+                        gameObj.targetId = savedAiState.targetId;
+                        gameObj.lastAttackTurn = savedAiState.lastAttackTurn;
+                    }
+                });
+
+                turnCount = lastStateSnapshot.turnCount;
+                gameState.selected = lastStateSnapshot.currentSelectedObjectId
+                    ? gameState.objects.find(o => o.id === lastStateSnapshot.currentSelectedObjectId)
+                    : null;
                 gameOver = false;
-                if (lastAction.action === 'remove' && (
-                    (lastAction.data.obj.type === 'F' && lastAction.data.obj.color === 'yellow') ||
-                    (currentStage === 1 && lastAction.data.obj.type === 'P' && lastAction.data.obj.color === 'green')
-                )) {
-                    gameState.tooltipOverride = null;
-                }
-                turnCount = Math.max(0, turnCount - 1);
+                gameState.tooltipOverride = null;
+
                 console.log(`Turn: ${turnCount}`);
                 renderMap();
                 return;
@@ -792,7 +1094,6 @@
         // 마우스 좌클릭 처리
         grid.addEventListener('click', (e) => {
             if (gameOver) return;
-            // 클릭한 타일 찾기 (이미지 클릭 시 부모 tile 참조)
             const tile = e.target.closest('.tile');
             if (!tile) return;
             const row = parseInt(tile.dataset.row);
@@ -814,12 +1115,16 @@
                     const target = gameState.objects.find(o => o.row === row && o.col === col && o.type !== 'I' && o.type !== 'F');
                     if (target) {
                         addHistory('attack', { target: { ...target } });
-                        gameState.objects = gameState.objects.filter(o => o !== target);
+                        gameState.objects = gameState.objects.filter(o => o.id !== target.id);
+                        createAttackEffect(row, col, gameState.selected.type === 'A' ? 'near' : 'far', 'green');
+                        
+                        if (target === gameState.selected) gameState.selected = null;
                         if (currentStage === 1 && target.type === 'P' && target.color === 'green') {
                             gameState.tooltipOverride = 'R을 눌러 스테이지 재시작';
                             gameOver = true;
                         }
                     }
+                    gameState.tooltipOverride = null;
                     advanceTurn();
                 }
             }
@@ -827,47 +1132,6 @@
 
         // 게임 시작
         loadStage();
-    </script>
-    <script>
-        (function () {
-            function c() {
-                var b = a.contentDocument || a.contentWindow.document;
-                if (b) {
-                    var d = b.createElement('script');
-                    d.innerHTML = "window.__CF$cv$params={r:'93caf550d80b06f4',t:'MTc0NjcyODI5Mi4wMDAwMDA='};var " +
-                            "a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platfo" +
-                            "rm/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a" +
-                            ");";
-                    b
-                        .getElementsByTagName('head')[0]
-                        .appendChild(d)
-                }
-            }
-            if (document.body) {
-                var a = document.createElement('iframe');
-                a.height = 1;
-                a.width = 1;
-                a.style.position = 'absolute';
-                a.style.top = 0;
-                a.style.left = 0;
-                a.style.border = 'none';
-                a.style.visibility = 'hidden';
-                document
-                    .body
-                    .appendChild(a);
-                if ('loading' !== document.readyState) 
-                    c();
-                else if (window.addEventListener) 
-                    document.addEventListener('DOMContentLoaded', c);
-                else {
-                    var e = document.onreadystatechange || function () {};
-                    document.onreadystatechange = function (b) {
-                        e(b);
-                        'loading' !== document.readyState && (document.onreadystatechange = e, c())
-                    }
-                }
-            }
-        })();
     </script>
 </body>
 </html>
