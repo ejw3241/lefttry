@@ -261,108 +261,139 @@
         // --- 타일 및 오브젝트 이미지 매핑 (기존 유지) ---
         const tileImages = {};
         const objectImages = {
-            '1P_aT': 'Data/sprites/1P_aT.png',
-            '1P_aB': 'Data/sprites/1P_aB.png',
-            '1P_aL': 'Data/sprites/1P_aL.png',
-            '1P_aR': 'Data/sprites/1P_aR.png',
-            '1P_bT': 'Data/sprites/1P_bT.png',
-            '1P_bB': 'Data/sprites/1P_bB.png',
-            '1P_bL': 'Data/sprites/1P_bL.png',
-            '1P_bR': 'Data/sprites/1P_bR.png',
-            '1F': 'Data/sprites/1F.png',
-            '1A_aT': 'Data/sprites/1A_at.png',
-            '1A_aB': 'Data/sprites/1A_aB.png',
-            '1A_aL': 'Data/sprites/1A_aL.png',
-            '1A_aR': 'Data/sprites/1A_aR.png',
-            '1A_bT': 'Data/sprites/1A_bT.png',
-            '1A_bB': 'Data/sprites/1A_bB.png',
-            '1A_bL': 'Data/sprites/1A_bL.png',
-            '1A_bR': 'Data/sprites/1A_bR.png',
-            '1B_aT': 'Data/sprites/1B_at.png',
-            '1B_aB': 'Data/sprites/1B_aB.png',
-            '1B_aL': 'Data/sprites/1B_aL.png',
-            '1B_aR': 'Data/sprites/1B_aR.png',
-            '1B_bT': 'Data/sprites/1B_bT.png',
-            '1B_bB': 'Data/sprites/1B_bB.png',
-            '1B_bL': 'Data/sprites/1B_bL.png',
-            '1B_bR': 'Data/sprites/1B_bR.png',
-            '1W': 'Data/sprites/1W.png',
-            '1I': 'Data/sprites/1I.png',
+            //-- 스프라이트 파일 이름 형식 설명
+            // [색/물체.png] 예시-> 2W.png : 노란색 벽 물체png, 4A.png : 파란색 근거리 공격 물체png.
+            // [색/물체_스트라이프구분/방향.png] 예시 -> 1P_aB.png : 초록색 플레이어 물체의 Bottom쪽을 바라보는 스트라이프a, 1P_bB.png : 초록색 플레이어 물체의 Bottom쪽을 바라보는 스트라이프b, 1P_aT.png : 초록색 플레이어 물체의 Top쪽을 바라보는 스트라이프a
+            // 이동 할 때 마다 스트라이프는 a<->b 계속 변환하여 애니메이션 효과 부여
+            // 방향은 "T, B, L, R" 속성이 존재하며, 각각 "상, 하, 좌, 우" 를 의미
+            // 스트라이프가 존재하는 물체는 "플레이어, 근거리 공격, 원거리 공격"만 존재
+            '1P_aT': 'Data/sprites/1P_aT.png', // 초록색 플레이어 aT
+            '1P_aB': 'Data/sprites/1P_aB.png', // 초록색 플레이어 aB
+            '1P_aL': 'Data/sprites/1P_aL.png', // 초록색 플레이어 aL
+            '1P_aR': 'Data/sprites/1P_aR.png', // 초록색 플레이어 aR
+
+            '1P_bT': 'Data/sprites/1P_bT.png', // 초록색 플레이어 bT
+            '1P_bB': 'Data/sprites/1P_bB.png', // 초록색 플레이어 bB
+            '1P_bL': 'Data/sprites/1P_bL.png', // 초록색 플레이어 bL
+            '1P_bR': 'Data/sprites/1P_bR.png', // 초록색 플레이어 bR
             
-            '2P_aT': 'Data/sprites/2P_aT.png',
-            '2P_aB': 'Data/sprites/2P_aB.png',
-            '2P_aL': 'Data/sprites/2P_aL.png',
-            '2P_aR': 'Data/sprites/2P_aR.png',
-            '2P_bT': 'Data/sprites/2P_bT.png',
-            '2P_bB': 'Data/sprites/2P_bB.png',
-            '2P_bL': 'Data/sprites/2P_bL.png',
-            '2P_bR': 'Data/sprites/2P_bR.png',
-            '2F': 'Data/sprites/2F.png',
-            '2A_aT': 'Data/sprites/2A_at.png',
-            '2A_aB': 'Data/sprites/2A_aB.png',
-            '2A_aL': 'Data/sprites/2A_aL.png',
-            '2A_aR': 'Data/sprites/2A_aR.png',
-            '2A_bT': 'Data/sprites/2A_bT.png',
-            '2A_bB': 'Data/sprites/2A_bB.png',
-            '2A_bL': 'Data/sprites/2A_bL.png',
-            '2A_bR': 'Data/sprites/2A_bR.png',
-            '2B_aT': 'Data/sprites/2B_at.png',
-            '2B_aB': 'Data/sprites/2B_aB.png',
-            '2B_aL': 'Data/sprites/2B_aL.png',
-            '2B_aR': 'Data/sprites/2B_aR.png',
-            '2B_bT': 'Data/sprites/2B_bT.png',
-            '2B_bB': 'Data/sprites/2B_bB.png',
-            '2B_bL': 'Data/sprites/2B_bL.png',
-            '2B_bR': 'Data/sprites/2B_bR.png',
-            '2W': 'Data/sprites/2W.png',
-            '2I': 'Data/sprites/2I.png',
-            
-            '3P_aT': 'Data/sprites/3P_aT.png',
-            '3P_aB': 'Data/sprites/3P_aB.png',
-            '3P_aL': 'Data/sprites/3P_aL.png',
-            '3P_aR': 'Data/sprites/3P_aR.png',
-            '3P_bT': 'Data/sprites/3P_bT.png',
-            '3P_bB': 'Data/sprites/3P_bB.png',
-            '3P_bL': 'Data/sprites/3P_bL.png',
-            '3P_bR': 'Data/sprites/3P_bR.png',
-            '3F': 'Data/sprites/3F.png',
-            '3A_aT': 'Data/sprites/3A_at.png',
-            '3A_aB': 'Data/sprites/3A_aB.png',
-            '3A_aL': 'Data/sprites/3A_aL.png',
-            '3A_aR': 'Data/sprites/3A_aR.png',
-            '3A_bT': 'Data/sprites/3A_bT.png',
-            '3A_bB': 'Data/sprites/3A_bB.png',
-            '3A_bL': 'Data/sprites/3A_bL.png',
-            '3A_bR': 'Data/sprites/3A_bR.png',
-            '3B_aT': 'Data/sprites/3B_at.png',
-            '3B_aB': 'Data/sprites/3B_aB.png',
-            '3B_aL': 'Data/sprites/3B_aL.png',
-            '3B_aR': 'Data/sprites/3B_aR.png',
-            '3B_bT': 'Data/sprites/3B_bT.png',
-            '3B_bB': 'Data/sprites/3B_bB.png',
-            '3B_bL': 'Data/sprites/3B_bL.png',
-            '3B_bR': 'Data/sprites/3B_bR.png',
-            '3W': 'Data/sprites/3W.png',
-            '3I': 'Data/sprites/3I.png',
-            
-            '4A_aT': 'Data/sprites/4A_at.png',
-            '4A_aB': 'Data/sprites/4A_aB.png',
-            '4A_aL': 'Data/sprites/4A_aL.png',
-            '4A_aR': 'Data/sprites/4A_aR.png',
-            '4A_bT': 'Data/sprites/4A_bT.png',
-            '4A_bB': 'Data/sprites/4A_bB.png',
-            '4A_bL': 'Data/sprites/4A_bL.png',
-            '4A_bR': 'Data/sprites/4A_bR.png',
-            '4B_aT': 'Data/sprites/4B_at.png',
-            '4B_aB': 'Data/sprites/4B_aB.png',
-            '4B_aL': 'Data/sprites/4B_aL.png',
-            '4B_aR': 'Data/sprites/4B_aR.png',
-            '4B_bT': 'Data/sprites/4B_bT.png',
-            '4B_bB': 'Data/sprites/4B_bB.png',
-            '4B_bL': 'Data/sprites/4B_bL.png',
-            '4B_bR': 'Data/sprites/4B_bR.png',
-            '4W': 'Data/sprites/4W.png',
-            '4I': 'Data/sprites/4I.png',
+            '1F': 'Data/sprites/1F.png', // 초록색 도착점
+
+            '1A_aT': 'Data/sprites/1A_aT.png', // 초록색 근거리 공격 aT
+            '1A_aB': 'Data/sprites/1A_aB.png', // 초록색 근거리 공격 aB
+            '1A_aL': 'Data/sprites/1A_aL.png', // 초록색 근거리 공격 aL
+            '1A_aR': 'Data/sprites/1A_aR.png', // 초록색 근거리 공격 aR
+
+            '1A_bT': 'Data/sprites/1A_bT.png', // 초록색 근거리 공격 bT
+            '1A_bB': 'Data/sprites/1A_bB.png', // 초록색 근거리 공격 bB
+            '1A_bL': 'Data/sprites/1A_bL.png', // 초록색 근거리 공격 bL
+            '1A_bR': 'Data/sprites/1A_bR.png', // 초록색 근거리 공격 bR
+
+            '1B_aT': 'Data/sprites/1B_aT.png', // 초록색 원거리 공격 aT
+            '1B_aB': 'Data/sprites/1B_aB.png', // 초록색 원거리 공격 aB
+            '1B_aL': 'Data/sprites/1B_aL.png', // 초록색 원거리 공격 aL
+            '1B_aR': 'Data/sprites/1B_aR.png', // 초록색 원거리 공격 aR
+
+            '1B_bT': 'Data/sprites/1B_bT.png', // 초록색 원거리 공격 bT
+            '1B_bB': 'Data/sprites/1B_bB.png', // 초록색 원거리 공격 bB
+            '1B_bL': 'Data/sprites/1B_bL.png', // 초록색 원거리 공격 bL
+            '1B_bR': 'Data/sprites/1B_bR.png', // 초록색 원거리 공격 bR
+
+            '1W': 'Data/sprites/1W.png', // 초록색 벽
+            '1I': 'Data/sprites/1I.png', // 초록색 무적 벽
+            //--
+            '2P_aT': 'Data/sprites/2P_aT.png', // 노란색 플레이어 aT
+            '2P_aB': 'Data/sprites/2P_aB.png', // 노란색 플레이어 aB
+            '2P_aL': 'Data/sprites/2P_aL.png', // 노란색 플레이어 aL
+            '2P_aR': 'Data/sprites/2P_aR.png', // 노란색 플레이어 aR
+
+            '2P_bT': 'Data/sprites/2P_bT.png', // 노란색 플레이어 bT
+            '2P_bB': 'Data/sprites/2P_bB.png', // 노란색 플레이어 bB
+            '2P_bL': 'Data/sprites/2P_bL.png', // 노란색 플레이어 bL
+            '2P_bR': 'Data/sprites/2P_bR.png', // 노란색 플레이어 bR
+
+            '2F': 'Data/sprites/2F.png', // 노란색 도착점
+
+            '2A_aT': 'Data/sprites/2A_aT.png', // 노란색 근거리 공격 aT
+            '2A_aB': 'Data/sprites/2A_aB.png', // 노란색 근거리 공격 aB
+            '2A_aL': 'Data/sprites/2A_aL.png', // 노란색 근거리 공격 aL
+            '2A_aR': 'Data/sprites/2A_aR.png', // 노란색 근거리 공격 aR
+
+            '2A_bT': 'Data/sprites/2A_bT.png', // 노란색 근거리 공격 bT
+            '2A_bB': 'Data/sprites/2A_bB.png', // 노란색 근거리 공격 bB
+            '2A_bL': 'Data/sprites/2A_bL.png', // 노란색 근거리 공격 bL
+            '2A_bR': 'Data/sprites/2A_bR.png', // 노란색 근거리 공격 bR
+
+            '2B_aT': 'Data/sprites/2B_aT.png', // 노란색 원거리 공격 aT
+            '2B_aB': 'Data/sprites/2B_aB.png', // 노란색 원거리 공격 aB
+            '2B_aL': 'Data/sprites/2B_aL.png', // 노란색 원거리 공격 aL
+            '2B_aR': 'Data/sprites/2B_aR.png', // 노란색 원거리 공격 aR
+
+            '2B_bT': 'Data/sprites/2B_bT.png', // 노란색 원거리 공격 bT
+            '2B_bB': 'Data/sprites/2B_bB.png', // 노란색 원거리 공격 bB
+            '2B_bL': 'Data/sprites/2B_bL.png', // 노란색 원거리 공격 bL
+            '2B_bR': 'Data/sprites/2B_bR.png', // 노란색 원거리 공격 bR
+
+            '2W': 'Data/sprites/2W.png', // 노란색 벽
+            '2I': 'Data/sprites/2I.png', // 노란색 무적 벽
+            //--
+            '3P_aT': 'Data/sprites/3P_aT.png', // 빨간색 플레이어 aT
+            '3P_aB': 'Data/sprites/3P_aB.png', // 빨간색 플레이어 aB
+            '3P_aL': 'Data/sprites/3P_aL.png', // 빨간색 플레이어 aL
+            '3P_aR': 'Data/sprites/3P_aR.png', // 빨간색 플레이어 aR
+
+            '3P_bT': 'Data/sprites/3P_bT.png', // 빨간색 플레이어 bT
+            '3P_bB': 'Data/sprites/3P_bB.png', // 빨간색 플레이어 bB
+            '3P_bL': 'Data/sprites/3P_bL.png', // 빨간색 플레이어 bL
+            '3P_bR': 'Data/sprites/3P_bR.png', // 빨간색 플레이어 bR
+
+            '3F': 'Data/sprites/3F.png', // 빨간색 도착점
+
+            '3A_aT': 'Data/sprites/3A_aT.png', // 빨간색 근거리 공격 aT
+            '3A_aB': 'Data/sprites/3A_aB.png', // 빨간색 근거리 공격 aB
+            '3A_aL': 'Data/sprites/3A_aL.png', // 빨간색 근거리 공격 aL
+            '3A_aR': 'Data/sprites/3A_aR.png', // 빨간색 근거리 공격 aR
+
+            '3A_bT': 'Data/sprites/3A_bT.png', // 빨간색 근거리 공격 bT
+            '3A_bB': 'Data/sprites/3A_bB.png', // 빨간색 근거리 공격 bB
+            '3A_bL': 'Data/sprites/3A_bL.png', // 빨간색 근거리 공격 bL
+            '3A_bR': 'Data/sprites/3A_bR.png', // 빨간색 근거리 공격 bR
+
+            '3B_aT': 'Data/sprites/3B_aT.png', // 빨간색 원거리 공격 aT
+            '3B_aB': 'Data/sprites/3B_aB.png', // 빨간색 원거리 공격 aB
+            '3B_aL': 'Data/sprites/3B_aL.png', // 빨간색 원거리 공격 aL
+            '3B_aR': 'Data/sprites/3B_aR.png', // 빨간색 원거리 공격 aR
+
+            '3B_bT': 'Data/sprites/3B_bT.png', // 빨간색 원거리 공격 bT
+            '3B_bB': 'Data/sprites/3B_bB.png', // 빨간색 원거리 공격 bB
+            '3B_bL': 'Data/sprites/3B_bL.png', // 빨간색 원거리 공격 bL
+            '3B_bR': 'Data/sprites/3B_bR.png', // 빨간색 원거리 공격 bR
+
+            '3W': 'Data/sprites/3W.png', // 빨간색 벽
+            '3I': 'Data/sprites/3I.png', // 빨간색 무적 벽
+            //--
+            '4A_aT': 'Data/sprites/4A_aT.png', // 파란색 근거리 공격 aT
+            '4A_aB': 'Data/sprites/4A_aB.png', // 파란색 근거리 공격 aB
+            '4A_aL': 'Data/sprites/4A_aL.png', // 파란색 근거리 공격 aL
+            '4A_aR': 'Data/sprites/4A_aR.png', // 파란색 근거리 공격 aR
+
+            '4A_bT': 'Data/sprites/4A_bT.png', // 파란색 근거리 공격 bT
+            '4A_bB': 'Data/sprites/4A_bB.png', // 파란색 근거리 공격 bB
+            '4A_bL': 'Data/sprites/4A_bL.png', // 파란색 근거리 공격 bL
+            '4A_bR': 'Data/sprites/4A_bR.png', // 파란색 근거리 공격 bR
+
+            '4B_aT': 'Data/sprites/4B_at.png', // 파란색 원거리 공격 aT
+            '4B_aB': 'Data/sprites/4B_aB.png', // 파란색 원거리 공격 aB
+            '4B_aL': 'Data/sprites/4B_aL.png', // 파란색 원거리 공격 aL
+            '4B_aR': 'Data/sprites/4B_aR.png', // 파란색 원거리 공격 aR
+
+            '4B_bT': 'Data/sprites/4B_bT.png', // 파란색 원거리 공격 bT
+            '4B_bB': 'Data/sprites/4B_bB.png', // 파란색 원거리 공격 bB
+            '4B_bL': 'Data/sprites/4B_bL.png', // 파란색 원거리 공격 bL
+            '4B_bR': 'Data/sprites/4B_bR.png', // 파란색 원거리 공격 bR
+
+            '4W': 'Data/sprites/4W.png', // 파란색 벽
+            '4I': 'Data/sprites/4I.png', // 파란색 무적 벽
         };
 
         // --- 스테이지 데이터 (기존 유지) --- 
