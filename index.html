@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>왼트_LeftTry_스프라이트수정</title>
+    <title>왼트_LeftTry</title>
     <style>
         @font-face {
             font-family: 'NeoDunggeunmoPro';
@@ -185,6 +185,45 @@
         }
         #bgm {
             display: none;
+        }
+        #external-link-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: calc(15px * 1.25) calc(30px * 1.25);
+            font-size: calc(18px * 1.25);
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+            border-radius: calc(8px * 1.25);
+            cursor: pointer;
+            margin-top: calc(20px * 1.25);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        #external-link-button:hover {
+            background: linear-gradient(45deg, #45a049, #4CAF50);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        #external-link-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .external-link-container {
+            text-align: center;
+            margin-top: calc(20px * 1.25);
+            padding: calc(20px * 1.25);
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: calc(10px * 1.25);
+        }
+
+        .external-link-description {
+            color: #ccc;
+            font-size: calc(14px * 1.25);
+            margin-bottom: calc(15px * 1.25);
+            font-family: 'NeoDunggeunmoPro', sans-serif;
         }
     </style>
 </head>
@@ -464,7 +503,32 @@
                 tooltip: [
                     'insert tooltip here'
                 ]
+            },
+            {
+                map: [
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '2W', '2W', '2W', '2W', '2W', '--', '2W', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '2W', '--', '--', '--', '2W', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '2W', '--', '--', '--', '2W', '2W', '--', '--', '2W', '--', '--', '--', '2W', '--', '--', '--'],
+                    ['--', '--', '--', '2W', '--', '--', '--', '2W', '--', '2W', '--', '--', '2W', '--', '2W', '--', '--', '--', '--'],
+                    ['--', '--', '--', '2W', '--', '--', '--', '2W', '--', '2W', '--', '--', '--', '2W', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '2W', '--', '--', '--', '2W', '--', '2W', '--', '--', '2W', '--', '2W', '--', '--', '--', '--'],
+                    ['--', '--', '--', '2W', '1P', '--', '--', '2W', '1A', '2W', '--', '2W', '--', '1B', '--', '2W', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--']
+                ],
+                tooltip: [
+                    'Thank you for playing!',
+                    '베타 테스트에 참여해 주셔서 감사합니다!'
+                ],
+                externalLink: {
+                    url: 'https://forms.gle/2NfZ5iuPa6oGkGsL8', // 실제 링크로 변경
+                    buttonText: '베타 피드백 제출하기',
+                    description: '게임에 대한 피드백을 남겨주세요! 3분도 안걸려요!'
+                }
             }
+
         ];
 
         // --- 게임 상태 변수 ---
@@ -838,11 +902,48 @@
                     grid.appendChild(tile);
                 }
             }
-            
-            message.textContent = gameOver ? 'Z: 한 칸 되돌리기, R: 스테이지 초기화 하기' : '';
-            stageDisplay.textContent = `Stage: ${currentStage + 1}`;
-            const tooltipText = gameState.tooltipOverride ? [gameState.tooltipOverride] : stage.tooltip;
-            tooltip.innerHTML = tooltipText.map(line => `<p>${line}</p>`).join('');
+
+                message.textContent = gameOver ? 'Z: 한 칸 되돌리기, R: 스테이지 초기화 하기' : '';
+                stageDisplay.textContent = `Stage: ${currentStage + 1}`;
+                const tooltipText = gameState.tooltipOverride ? [gameState.tooltipOverride] : stage.tooltip;
+                tooltip.innerHTML = tooltipText.map(line => `<p>${line}</p>`).join('');
+                
+                // 외부 링크 버튼 렌더링 (새로 추가)
+                renderExternalLinkButton(stage);
+            }
+
+            // 외부 링크 버튼 렌더링 함수 (새로 추가)
+            function renderExternalLinkButton(stage) {
+                // 기존 외부 링크 컨테이너 제거
+                const existingContainer = document.getElementById('external-link-container');
+                if (existingContainer) {
+                    existingContainer.remove();
+                }
+                
+                // 외부 링크가 있는 스테이지에만 버튼 표시
+                if (stage.externalLink) {
+                    const container = document.createElement('div');
+                    container.id = 'external-link-container';
+                    container.className = 'external-link-container';
+                    
+                    const description = document.createElement('div');
+                    description.className = 'external-link-description';
+                    description.textContent = stage.externalLink.description;
+                    
+                    const button = document.createElement('button');
+                    button.id = 'external-link-button';
+                    button.textContent = stage.externalLink.buttonText;
+                    button.onclick = () => {
+                        window.open(stage.externalLink.url, '_blank');
+                    };
+                    
+                    container.appendChild(description);
+                    container.appendChild(button);
+                    
+                    // tooltip 아래에 추가
+                    const gameWrapper = document.getElementById('game-wrapper');
+                    gameWrapper.appendChild(container);
+                }
         }
 
         function canMove(row, col, movingObj) {
