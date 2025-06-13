@@ -225,12 +225,33 @@
             margin-bottom: calc(15px * 1.25);
             font-family: 'NeoDunggeunmoPro', sans-serif;
         }
+
+        #turn-display {
+            font-size: calc(16px * 1.25);
+            text-align: center;
+            margin-bottom: calc(10px * 1.25);
+            color: #fff;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+
+        .turn-warning {
+            color: #ff6600 !important;
+            font-weight: bold;
+        }
+
+        .turn-critical {
+            color: #ff0000 !important;
+            font-weight: bold;
+            animation: pulse 1s infinite;
+        }
+
     </style>
 </head>
 <body>
     <div id="game-wrapper">
         <div id="game-container">
             <div id="stage-display"></div>
+            <div id="turn-display"></div>
             <div id="grid" class="grid"></div>
             <div id="message"></div>
         </div>
@@ -238,6 +259,7 @@
     </div>
     <div id="clear-message">Clear!</div>
     <audio id="bgm" loop></audio>
+
 
     <script async>
         // --- 배경음악 설정 ---
@@ -310,32 +332,32 @@
             '2P_bT': 'Data/sprites/2P_bT.png', // 노란색 플레이어 bT
             '2P_bB': 'Data/sprites/2P_bB.png', // 노란색 플레이어 bB
             '2P_bL': 'Data/sprites/2P_bL.png', // 노란색 플레이어 bL
-            '2P_bR': 'Data/sprites/2P_bR.png', // 노란색 플레이어 bR
+            '2P_bR': 'Data/sprites/2P_bR.png', // 노간색 플레이어 bR
 
-            '2F': 'Data/sprites/2F.png', // 노란색 도착점
+            '2F': 'Data/sprites/2F.png', // 노간색 도착점
 
-            '2A_aT': 'Data/sprites/2A_aT.png', // 노란색 근거리 공격 aT
-            '2A_aB': 'Data/sprites/2A_aB.png', // 노란색 근거리 공격 aB
-            '2A_aL': 'Data/sprites/2A_aL.png', // 노란색 근거리 공격 aL
-            '2A_aR': 'Data/sprites/2A_aR.png', // 노란색 근거리 공격 aR
+            '2A_aT': 'Data/sprites/2A_aT.png', // 노간색 근거리 공격 aT
+            '2A_aB': 'Data/sprites/2A_aB.png', // 노간색 근거리 공격 aB
+            '2A_aL': 'Data/sprites/2A_aL.png', // 노간색 근거리 공격 aL
+            '2A_aR': 'Data/sprites/2A_aR.png', // 노간색 근거리 공격 aR
 
-            '2A_bT': 'Data/sprites/2A_bT.png', // 노란색 근거리 공격 bT
-            '2A_bB': 'Data/sprites/2A_bB.png', // 노란색 근거리 공격 bB
-            '2A_bL': 'Data/sprites/2A_bL.png', // 노란색 근거리 공격 bL
-            '2A_bR': 'Data/sprites/2A_bR.png', // 노란색 근거리 공격 bR
+            '2A_bT': 'Data/sprites/2A_bT.png', // 노간색 근거리 공격 bT
+            '2A_bB': 'Data/sprites/2A_bB.png', // 노간색 근거리 공격 bB
+            '2A_bL': 'Data/sprites/2A_bL.png', // 노간색 근거리 공격 bL
+            '2A_bR': 'Data/sprites/2A_bR.png', // 노간색 근거리 공격 bR
 
-            '2B_aT': 'Data/sprites/2B_aT.png', // 노란색 원거리 공격 aT
-            '2B_aB': 'Data/sprites/2B_aB.png', // 노란색 원거리 공격 aB
-            '2B_aL': 'Data/sprites/2B_aL.png', // 노란색 원거리 공격 aL
-            '2B_aR': 'Data/sprites/2B_aR.png', // 노란색 원거리 공격 aR
+            '2B_aT': 'Data/sprites/2B_aT.png', // 노간색 원거리 공격 aT
+            '2B_aB': 'Data/sprites/2B_aB.png', // 노간색 원거리 공격 aB
+            '2B_aL': 'Data/sprites/2B_aL.png', // 노간색 원거리 공격 aL
+            '2B_aR': 'Data/sprites/2B_aR.png', // 노간색 원거리 공격 aR
 
-            '2B_bT': 'Data/sprites/2B_bT.png', // 노란색 원거리 공격 bT
-            '2B_bB': 'Data/sprites/2B_bB.png', // 노란색 원거리 공격 bB
-            '2B_bL': 'Data/sprites/2B_bL.png', // 노란색 원거리 공격 bL
-            '2B_bR': 'Data/sprites/2B_bR.png', // 노란색 원거리 공격 bR
+            '2B_bT': 'Data/sprites/2B_bT.png', // 노간색 원거리 공격 bT
+            '2B_bB': 'Data/sprites/2B_bB.png', // 노간색 원거리 공격 bB
+            '2B_bL': 'Data/sprites/2B_bL.png', // 노간색 원거리 공격 bL
+            '2B_bR': 'Data/sprites/2B_bR.png', // 노간색 원거리 공격 bR
 
-            '2W': 'Data/sprites/2W.png', // 노란색 벽
-            '2I': 'Data/sprites/2I.png', // 노란색 무적 벽
+            '2W': 'Data/sprites/2W.png', // 노간색 벽
+            '2I': 'Data/sprites/2I.png', // 노간색 무적 벽
             //--
             '3P_aT': 'Data/sprites/3P_aT.png', // 빨간색 플레이어 aT
             '3P_aB': 'Data/sprites/3P_aB.png', // 빨간색 플레이어 aB
@@ -372,28 +394,28 @@
             '3W': 'Data/sprites/3W.png', // 빨간색 벽
             '3I': 'Data/sprites/3I.png', // 빨간색 무적 벽
             //--
-            '4A_aT': 'Data/sprites/4A_aT.png', // 파란색 근거리 공격 aT
-            '4A_aB': 'Data/sprites/4A_aB.png', // 파란색 근거리 공격 aB
-            '4A_aL': 'Data/sprites/4A_aL.png', // 파란색 근거리 공격 aL
-            '4A_aR': 'Data/sprites/4A_aR.png', // 파란색 근거리 공격 aR
+            '4A_aT': 'Data/sprites/4A_aT.png', // 파간색 근거리 공격 aT
+            '4A_aB': 'Data/sprites/4A_aB.png', // 파간색 근거리 공격 aB
+            '4A_aL': 'Data/sprites/4A_aL.png', // 파간색 근거리 공격 aL
+            '4A_aR': 'Data/sprites/4A_aR.png', // 파간색 근거리 공격 aR
 
-            '4A_bT': 'Data/sprites/4A_bT.png', // 파란색 근거리 공격 bT
-            '4A_bB': 'Data/sprites/4A_bB.png', // 파란색 근거리 공격 bB
-            '4A_bL': 'Data/sprites/4A_bL.png', // 파란색 근거리 공격 bL
-            '4A_bR': 'Data/sprites/4A_bR.png', // 파란색 근거리 공격 bR
+            '4A_bT': 'Data/sprites/4A_bT.png', // 파간색 근거리 공격 bT
+            '4A_bB': 'Data/sprites/4A_bB.png', // 파간색 근거리 공격 bB
+            '4A_bL': 'Data/sprites/4A_bL.png', // 파간색 근거리 공격 bL
+            '4A_bR': 'Data/sprites/4A_bR.png', // 파간색 근거리 공격 bR
 
-            '4B_aT': 'Data/sprites/4B_at.png', // 파란색 원거리 공격 aT
-            '4B_aB': 'Data/sprites/4B_aB.png', // 파란색 원거리 공격 aB
-            '4B_aL': 'Data/sprites/4B_aL.png', // 파란색 원거리 공격 aL
-            '4B_aR': 'Data/sprites/4B_aR.png', // 파란색 원거리 공격 aR
+            '4B_aT': 'Data/sprites/4B_aT.png', // 파간색 원거리 공격 aT
+            '4B_aB': 'Data/sprites/4B_aB.png', // 파간색 원거리 공격 aB
+            '4B_aL': 'Data/sprites/4B_aL.png', // 파간색 원거리 공격 aL
+            '4B_aR': 'Data/sprites/4B_aR.png', // 파간색 원거리 공격 aR
 
-            '4B_bT': 'Data/sprites/4B_bT.png', // 파란색 원거리 공격 bT
-            '4B_bB': 'Data/sprites/4B_bB.png', // 파란색 원거리 공격 bB
-            '4B_bL': 'Data/sprites/4B_bL.png', // 파란색 원거리 공격 bL
-            '4B_bR': 'Data/sprites/4B_bR.png', // 파란색 원거리 공격 bR
+            '4B_bT': 'Data/sprites/4B_bT.png', // 파간색 원거리 공격 bT
+            '4B_bB': 'Data/sprites/4B_bB.png', // 파간색 원거리 공격 bB
+            '4B_bL': 'Data/sprites/4B_bL.png', // 파간색 원거리 공격 bL
+            '4B_bR': 'Data/sprites/4B_bR.png', // 파간색 원거리 공격 bR
 
-            '4W': 'Data/sprites/4W.png', // 파란색 벽
-            '4I': 'Data/sprites/4I.png', // 파란색 무적 벽
+            '4W': 'Data/sprites/4W.png', // 파간색 벽
+            '4I': 'Data/sprites/4I.png', // 파간색 무적 벽
             
         };
 
@@ -406,9 +428,10 @@
                     ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00']
                 ],
                 tooltip: [
-                    '초록색 플레이어가 노란색 도착점에 닿으면 레벨이 클리어 됩니다.',
+                    '초록색 플레이어가 노간색 도착점에 닿으면 레벨이 클리어 됩니다.',
                     'W, A, S, D로 이동합니다'
-                ]
+                ],
+                turnLimit: 0
             },
             {
                 map: [
@@ -421,7 +444,8 @@
                 tooltip: [
                     '모든 규칙은 왼쪽부터 적용됩니다.',
                     '"SPACE"키로 물체를 부술 수 있습니다.'
-                ]
+                ],
+                turnLimit: 18
             },
             {
                 map: [
@@ -432,8 +456,9 @@
                 tooltip: [
                     '모든 규칙은 왼쪽부터 적용됩니다.',
                     '"TAP"키로 물체의 색을 바꿀 수 있습니다.',
-                    '바뀌는 순서는 초록 > 노랑 > 빨강 순서입니다.'
-                ]
+                    '바뀌는 순서는 초록 > 노간 > 빨강 순서입니다.'
+                ],
+                turnLimit: 0
             },
             {
                 map: [
@@ -447,7 +472,8 @@
                 ],
                 tooltip: [
                     '빨간색 물체는 당신을 공격하는 적입니다.'
-                ]
+                ],
+                turnLimit: 11
             },
             {
                 map: [
@@ -460,12 +486,13 @@
                     ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00']
                 ],
                 tooltip: [
-                    '예외로 파란색 물체는 어떠한 규칙도 통하지 않습니다.',
+                    '예외로 파간색 물체는 어떠한 규칙도 통하지 않습니다.',
                     '게다가 이들이 가장 왼쪽에 있으면 다른 물체들도 규칙을 물려받을 수 없게 됩니다.',
                     ' ',
                     '마우스 좌클릭으로 물체를 부술 수 있습니다. (공격 가능 물체만)',
                     '마우스 좌클릭으로 어떤 물체를 조작할지 선택할 수 있습니다.'
-                ]
+                ],
+                turnLimit: 21
             },
             {
                 map: [
@@ -478,7 +505,8 @@
                 ],
                 tooltip: [
                     'insert tooltip here', '(8, 2)2W 이동 로직 만들고 나면 넣기.'
-                ]
+                ],
+                turnLimit: 20
             },
             {
                 map: [
@@ -494,7 +522,8 @@
                 ],
                 tooltip: [
                     'insert tooltip here'
-                ]
+                ],
+                turnLimit: 30
             },
             {
                 map: [
@@ -506,7 +535,8 @@
                 ],
                 tooltip: [
                     'insert tooltip here'
-                ]
+                ],
+                turnLimit: 28
             },
             {
                 map: [
@@ -520,7 +550,8 @@
                 ],
                 tooltip: [
                     'insert tooltip here', '(5,3) 4W, 3A의 어그로 이동 로직 만들고 나면 넣기'
-                ]
+                ],
+                turnLimit: 30
             },
             {
                 map: [
@@ -534,7 +565,8 @@
                 ],
                 tooltip: [
                     'insert tooltip here'
-                ]
+                ],
+                turnLimit: 30
             },
             {
                 map: [
@@ -554,6 +586,8 @@
                     'Thank you for playing!',
                     '베타 테스트에 참여해 주셔서 감사합니다!'
                 ],
+                turnLimit: 0,
+                clearMessage: '베타 테스트 클리어!',
                 externalLink: {
                     url: 'https://forms.gle/2NfZ5iuPa6oGkGsL8', // 실제 링크로 변경
                     buttonText: '베타 피드백 제출하기',
@@ -579,6 +613,7 @@
         const tooltip = document.getElementById('tooltip');
         const stageDisplay = document.getElementById('stage-display');
         const clearMessage = document.getElementById('clear-message');
+        const turnDisplay = document.getElementById('turn-display');
         const MAX_HISTORY = 512;
 
         // --- A* 경로탐색 알고리즘 ---
@@ -693,7 +728,38 @@
             }, attackType === 'near' ? 1500 : 300);
         }
 
-        // --- AI 시스템 ---
+        // --- 턴 제한 체크 함수 (새로 추가) ---
+        function checkTurnLimit() {
+            const stage = stages[currentStage];
+            if (stage.turnLimit && stage.turnLimit > 0 && turnCount >= stage.turnLimit) {
+                // 모든 도착점(1F, 2F, 3F) 제거
+                const arrivalPoints = gameState.objects.filter(o => o.type === 'F');
+                arrivalPoints.forEach(point => {
+                    addHistory('turnLimitRemove', { obj: { ...point } });
+                    gameState.objects = gameState.objects.filter(o => o.id !== point.id);
+                });
+                
+                // 패배 처리
+                gameState.tooltipOverride = '턴 제한 초과! R로 재시작하세요.';
+                gameOver = true;
+                return true;
+            }
+            return false;
+        }
+
+        // --- 패배 조건 체크 함수 (새로 추가) ---
+        function checkDefeatConditions() {
+            // 도착점이 모두 제거되었는지 확인
+            const remainingArrivalPoints = gameState.objects.filter(o => o.type === 'F');
+            if (remainingArrivalPoints.length === 0) {
+                gameState.tooltipOverride = 'R을 눌러 스테이지 재시작';
+                gameOver = true;
+                return true;
+            }
+            return false;
+        }
+
+        // --- AI 시스템 (수정됨) ---
         function processEnemyNearRange(obj) {
             let currentTarget = gameState.objects.find(o => o.id === obj.targetId);
 
@@ -740,11 +806,11 @@
                     obj.targetId = null;
                     obj.isTracking = false;
                     
-                    if (currentTarget === gameState.selected) gameState.selected = null;
-                    if (currentTarget.type === 'P' && currentTarget.color === 'green') {
-                        gameOver = true;
-                        gameState.tooltipOverride = 'R을 눌러 스테이지 재시작';
+                    if (currentTarget === gameState.selected) {
+                        gameState.selected = gameState.objects.find(o => o.color === 'green' && o.type !== 'F') || null;
                     }
+                    
+                    // 레거시 코드 제거: 1P 파괴는 더 이상 게임오버가 아님
                     return;
                 }
 
@@ -832,11 +898,11 @@
                         obj.lastAttackTurn = null;
                         obj.isTracking = false;
                         
-                        if (currentTarget === gameState.selected) gameState.selected = null;
-                        if (currentTarget.type === 'P' && currentTarget.color === 'green') {
-                            gameOver = true;
-                            gameState.tooltipOverride = 'R을 눌러 스테이지 재시작';
+                        if (currentTarget === gameState.selected) {
+                            gameState.selected = gameState.objects.find(o => o.color === 'green' && o.type !== 'F') || null;
                         }
+                        
+                        // 레거시 코드 제거: 1P 파괴는 더 이상 게임오버가 아님
                     }
                 }
             }
@@ -935,47 +1001,81 @@
                 }
             }
 
-                message.textContent = gameOver ? 'Z: 한 칸 되돌리기, R: 스테이지 초기화 하기' : '';
-                stageDisplay.textContent = `Stage: ${currentStage + 1}`;
-                const tooltipText = gameState.tooltipOverride ? [gameState.tooltipOverride] : stage.tooltip;
-                tooltip.innerHTML = tooltipText.map(line => `<p>${line}</p>`).join('');
-                
-                // 외부 링크 버튼 렌더링 (새로 추가)
-                renderExternalLinkButton(stage);
-            }
+            message.textContent = gameOver ? 'Z: 한 칸 되돌리기, R: 스테이지 초기화 하기' : '';
+            stageDisplay.textContent = `Stage: ${currentStage + 1}`;
 
-            // 외부 링크 버튼 렌더링 함수 (새로 추가)
-            function renderExternalLinkButton(stage) {
-                // 기존 외부 링크 컨테이너 제거
-                const existingContainer = document.getElementById('external-link-container');
-                if (existingContainer) {
-                    existingContainer.remove();
+            // 턴 표시 업데이트 (새로 추가)
+            updateTurnDisplay();
+
+            const tooltipText = gameState.tooltipOverride ? [gameState.tooltipOverride] : stage.tooltip;
+            tooltip.innerHTML = tooltipText.map(line => `<p>${line}</p>`).join('');
+            
+            // 외부 링크 버튼 렌더링 (새로 추가)
+            renderExternalLinkButton(stage);
+        }
+
+        // 턴 표시 업데이트 함수 (새로 추가)
+        function updateTurnDisplay() {
+            const turnDisplay = document.getElementById('turn-display');
+            if (!turnDisplay) return;
+            
+            const stage = stages[currentStage];
+            
+            if (stage.turnLimit && stage.turnLimit > 0) {
+                const remainingTurns = stage.turnLimit - turnCount;
+                let displayText = `Turn: ${turnCount}/${stage.turnLimit} (남은 턴: ${remainingTurns})`;
+                
+                // 턴 수에 따른 색상 변경
+                turnDisplay.className = '';
+                if (remainingTurns <= 2) {
+                    turnDisplay.classList.add('turn-critical');
+                } else if (remainingTurns <= 5) {
+                    turnDisplay.classList.add('turn-warning');
                 }
                 
-                // 외부 링크가 있는 스테이지에만 버튼 표시
-                if (stage.externalLink) {
-                    const container = document.createElement('div');
-                    container.id = 'external-link-container';
-                    container.className = 'external-link-container';
-                    
-                    const description = document.createElement('div');
-                    description.className = 'external-link-description';
-                    description.textContent = stage.externalLink.description;
-                    
-                    const button = document.createElement('button');
-                    button.id = 'external-link-button';
-                    button.textContent = stage.externalLink.buttonText;
-                    button.onclick = () => {
-                        window.open(stage.externalLink.url, '_blank');
-                    };
-                    
-                    container.appendChild(description);
-                    container.appendChild(button);
-                    
-                    // tooltip 아래에 추가
-                    const gameWrapper = document.getElementById('game-wrapper');
-                    gameWrapper.appendChild(container);
-                }
+                turnDisplay.textContent = displayText;
+                turnDisplay.style.display = 'block';
+            } else {
+                // 턴 제한이 없는 스테이지
+                turnDisplay.textContent = `Turn: ${turnCount}`;
+                turnDisplay.className = '';
+                turnDisplay.style.display = 'block';
+            }
+        }
+
+
+        // 외부 링크 버튼 렌더링 함수 (새로 추가)
+        function renderExternalLinkButton(stage) {
+            // 기존 외부 링크 컨테이너 제거
+            const existingContainer = document.getElementById('external-link-container');
+            if (existingContainer) {
+                existingContainer.remove();
+            }
+            
+            // 외부 링크가 있는 스테이지에만 버튼 표시
+            if (stage.externalLink) {
+                const container = document.createElement('div');
+                container.id = 'external-link-container';
+                container.className = 'external-link-container';
+                
+                const description = document.createElement('div');
+                description.className = 'external-link-description';
+                description.textContent = stage.externalLink.description;
+                
+                const button = document.createElement('button');
+                button.id = 'external-link-button';
+                button.textContent = stage.externalLink.buttonText;
+                button.onclick = () => {
+                    window.open(stage.externalLink.url, '_blank');
+                };
+                
+                container.appendChild(description);
+                container.appendChild(button);
+                
+                // tooltip 아래에 추가
+                const gameWrapper = document.getElementById('game-wrapper');
+                gameWrapper.appendChild(container);
+            }
         }
 
         function canMove(row, col, movingObj) {
@@ -1016,12 +1116,19 @@
             }
         }
 
+        // --- 수정된 advanceTurn 함수 ---
         function advanceTurn() {
             if (gameOver) return;
             turnCount++;
             console.log(`Turn: ${turnCount}`);
 
-            // AI 처리
+            // 1. 턴 제한 체크 (승리 조건보다 먼저 처리)
+            if (checkTurnLimit()) {
+                renderMap();
+                return;
+            }
+
+            // 2. AI 처리
             gameState.objects.forEach(obj => {
                 if ((obj.type === 'A') && (obj.color === 'red' || obj.color === 'blue')) {
                     processEnemyNearRange(obj);
@@ -1030,7 +1137,7 @@
                 }
             });
 
-            // 기존 3B 공격 로직 (호환성 유지)
+            // 3. 기존 3B 공격 로직 (호환성 유지) - 1P 파괴 부분 수정
             gameState.objects.forEach(obj => {
                 if (obj.color === 'red' && obj.type === 'B' && !obj.hasOwnProperty('targetId')) {
                     const range = 3;
@@ -1046,8 +1153,11 @@
                                 }
                                 addHistory('attack', { target: { ...green } });
                                 gameState.objects = gameState.objects.filter(o => o.id !== green.id);
-                                if (green === gameState.selected) gameState.selected = null;
-                                gameOver = true;
+                                if (green === gameState.selected) {
+                                    // 다른 초록색 물체로 선택 변경 시도
+                                    gameState.selected = gameState.objects.find(o => o.color === 'green' && o.type !== 'F') || null;
+                                }
+                                // 1P 파괴는 더 이상 게임오버가 아님 (레거시 코드 제거)
                             }
                         } else {
                             obj.moving = false;
@@ -1055,6 +1165,9 @@
                     });
                 }
             });
+
+            // 4. 패배 조건 체크
+            checkDefeatConditions();
 
             renderMap();
         }
@@ -1083,7 +1196,7 @@
             }
         }
 
-        // --- 이벤트 리스너 ---
+        // --- 이벤트 리스너 (수정됨) ---
         document.addEventListener('keydown', (e) => {
             // BGM 재생
             if (bgmLoaded && bgm.paused) {
@@ -1095,7 +1208,7 @@
             if (gameOver && e.key !== 'z' && e.key !== 'r') return;
             let actionTaken = false;
 
-            // 이동 (WASD)
+            // 이동 (WASD) - 기존 코드 유지
             if (e.key === 'w' || e.key === 's' || e.key === 'a' || e.key === 'd') {
                 if (!gameState.selected || gameState.selected.color !== 'green' || gameState.selected.type === 'F') return;
                 const newPos = { row: gameState.selected.row, col: gameState.selected.col };
@@ -1130,11 +1243,11 @@
                     }
                 }
             }
-            // 제거 (Space)
+            // 제거 (Space) - 수정된 부분
             else if (e.key === ' ') {
                 const leftmost = findLeftmost();
                 if (leftmost && leftmost.color === 'blue') {
-                    message.textContent = '파란색 물체로 인해 규칙이 막혔습니다';
+                    message.textContent = '파간색 물체로 인해 규칙이 막혔습니다';
                     setTimeout(() => message.textContent = '', 3000);
                     return;
                 }
@@ -1144,13 +1257,13 @@
                     if (leftmost === gameState.selected) {
                         gameState.selected = gameState.objects.find(o => o.color === 'green' && o.type !== 'F') || null;
                     }
-                    if (leftmost.type === 'F' && leftmost.color === 'yellow') {
-                        gameState.tooltipOverride = 'R을 눌러 스테이지 재시작';
-                        gameOver = true;
-                    } else if (currentStage === 1 && leftmost.type === 'P' && leftmost.color === 'green') {
-                        gameState.tooltipOverride = 'R을 눌러 스테이지 재시작';
-                        gameOver = true;
+                    
+                    // 수정: 모든 도착점(F) 제거시 패배 처리
+                    if (leftmost.type === 'F') {
+                        // checkDefeatConditions()가 advanceTurn()에서 호출될 예정
                     }
+                    
+                    // 레거시 코드 제거: 1P 파괴는 더 이상 게임오버가 아님
                 }
                 actionTaken = true;
                 renderMap();
@@ -1172,17 +1285,17 @@
                 }
                 actionTaken = true;
             }
-            // 턴 넘기기 (Q)
+            // 턴 넘기기 (Q) - 기존 코드 유지
             else if (e.key === 'q') {
                 addHistory('skip', { turn: turnCount });
                 actionTaken = true;
             }
-            // 리셋 (R)
+            // 리셋 (R) - 기존 코드 유지
             else if (e.key === 'r') {
                 loadStage();
                 return;
             }
-            // 되돌리기 (Z)
+            // 되돌리기 (Z) - 기존 코드 유지
             else if (e.key === 'z' && gameState.history.length > 0) {
                 const lastStateSnapshot = gameState.history.pop().state;
 
@@ -1211,7 +1324,7 @@
             if (actionTaken) advanceTurn();
         });
 
-        // 마우스 좌클릭 처리
+        // --- 수정된 마우스 클릭 이벤트 리스너 ---
         grid.addEventListener('click', (e) => {
             if (gameOver) return;
             const tile = e.target.closest('.tile');
@@ -1227,7 +1340,7 @@
                 return;
             }
 
-            // 공격 처리
+            // 공격 처리 - 수정된 부분
             const greenAttack = gameState.selected && gameState.selected.color === 'green' && (gameState.selected.type === 'A' || gameState.selected.type === 'B');
             if (greenAttack) {
                 const range = gameState.selected.type === 'A' ? 1 : 3;
@@ -1238,11 +1351,11 @@
                         gameState.objects = gameState.objects.filter(o => o.id !== target.id);
                         createAttackEffect(row, col, gameState.selected.type === 'A' ? 'near' : 'far', 'green');
                         
-                        if (target === gameState.selected) gameState.selected = null;
-                        if (currentStage === 1 && target.type === 'P' && target.color === 'green') {
-                            gameState.tooltipOverride = 'R을 눌러 스테이지 재시작';
-                            gameOver = true;
+                        if (target === gameState.selected) {
+                            gameState.selected = gameState.objects.find(o => o.color === 'green' && o.type !== 'F') || null;
                         }
+                        
+                        // 레거시 코드 제거: 1P 파괴는 더 이상 게임오버가 아님
                     }
                     gameState.tooltipOverride = null;
                     advanceTurn();
@@ -1250,8 +1363,41 @@
             }
         });
 
+        // --- 턴 제한 체크 함수 (새로 추가) ---
+        function checkTurnLimit() {
+            const stage = stages[currentStage];
+            if (stage.turnLimit && stage.turnLimit > 0 && turnCount >= stage.turnLimit) {
+                // 모든 도착점(1F, 2F, 3F) 제거
+                const arrivalPoints = gameState.objects.filter(o => o.type === 'F');
+                arrivalPoints.forEach(point => {
+                    addHistory('turnLimitRemove', { obj: { ...point } });
+                    gameState.objects = gameState.objects.filter(o => o.id !== point.id);
+                });
+                
+                // 패배 처리
+                gameState.tooltipOverride = '턴 제한 초과! R로 재시작하세요.';
+                gameOver = true;
+                return true;
+            }
+            return false;
+        }
+
+        // --- 패배 조건 체크 함수 (새로 추가) ---
+        function checkDefeatConditions() {
+            // 도착점이 모두 제거되었는지 확인
+            const remainingArrivalPoints = gameState.objects.filter(o => o.type === 'F');
+            if (remainingArrivalPoints.length === 0) {
+                gameState.tooltipOverride = 'R을 눌러 스테이지 재시작';
+                gameOver = true;
+                return true;
+            }
+            return false;
+        }
+
         // 게임 시작
         loadStage();
     </script>
+
+
 </body>
 </html>
