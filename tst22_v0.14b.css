@@ -1,0 +1,286 @@
+        @font-face {
+            font-family: 'NeoDunggeunmoPro';
+            src: url('Data/font/NeoDunggeunmoPro-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            background-color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+        #game-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #game-container {
+            display: inline-block;
+            background-color: #080808;
+            padding: calc(10px * 1.25);
+            position: relative;
+        }
+        .grid {
+            display: grid;
+            gap: calc(2px * 1.25);
+        }
+        .tile {
+            width: calc(40px * 1.25);
+            height: calc(40px * 1.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: calc(16px * 1.25);
+            color: #000;
+            cursor: pointer;
+            position: relative;
+        }
+        /* 기존 .tile img 스타일을 아래 내용으로 교체하거나 덧붙여주세요 */
+        .tile img.object-sprite {
+            position: absolute; /* 겹치기 위해 absolute 포지션 사용 */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            z-index: 5; /* 기본 z-index */
+            pointer-events: none;
+        }
+
+        /* [신규] 플레이어 스프라이트가 항상 위에 보이도록 z-index를 높게 설정 */
+        .tile img.player-sprite {
+            z-index: 10;
+        }
+
+        .empty { background-color: #293141; }
+        .floor { background-color: #15181F; }
+        .floor::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 0;
+        }
+        .green { background-color: #00FF00; }
+        .yellow { background-color: #FFFF00; }
+        .red { background-color: #FF0000; }
+        .blue { background-color: #0000FF; }
+        
+        /* 추적 상태 시각화 */
+        .tracking {
+            border: 3px solid #ff6600 !important;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { border-color: #ff6600; }
+            50% { border-color: #ffaa00; }
+            100% { border-color: #ff6600; }
+        }
+        
+        /* 공격 이펙트 */
+        .attack-effect-near {
+            position: absolute;
+            background: radial-gradient(circle, rgba(255, 100, 0, 0.9), rgba(255, 0, 0, 0.5), transparent);
+            border-radius: 50%;
+            z-index: 1000;
+            pointer-events: none;
+            animation: explode 1.5s ease-out;
+        }
+        .attack-effect-far {
+            position: absolute;
+            background: linear-gradient(90deg, rgba(255, 0, 0, 0.9), rgba(255, 100, 0, 0.7), transparent);
+            z-index: 1000;
+            pointer-events: none;
+            animation: laser 0.3s ease-out;
+        }
+        .attack-effect-blue-near {
+            position: absolute;
+            background: radial-gradient(circle, rgba(0, 100, 255, 0.9), rgba(0, 0, 255, 0.5), transparent);
+            border-radius: 50%;
+            z-index: 1000;
+            pointer-events: none;
+            animation: explode 1.5s ease-out;
+        }
+        .attack-effect-blue-far {
+            position: absolute;
+            background: linear-gradient(90deg, rgba(0, 0, 255, 0.9), rgba(0, 100, 255, 0.7), transparent);
+            z-index: 1000;
+            pointer-events: none;
+            animation: laser 0.3s ease-out;
+        }
+        
+        @keyframes explode {
+            0% { transform: scale(0.5); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        @keyframes laser {
+            0% { opacity: 1; transform: scaleX(0); }
+            50% { opacity: 1; transform: scaleX(1); }
+            100% { opacity: 0; transform: scaleX(1); }
+        }
+        
+        #stage-display {
+            font-size: calc(18px * 1.25);
+            text-align: center;
+            margin-bottom: calc(10px * 1.25);
+            color: #fff;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+        #message {
+            font-size: calc(20px * 1.25);
+            text-align: center;
+            margin-top: calc(10px * 1.25);
+            color: #fff;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+        #tooltip {
+            font-size: calc(16px * 1.25);
+            text-align: center;
+            margin-top: calc(10px * 1.25);
+            color: #ccc;
+            max-width: calc(600px * 1.25);
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+        #tooltip p {
+            margin: calc(5px * 1.25) 0;
+        }
+        #clear-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: calc(48px * 1.25);
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: calc(20px * 1.25) calc(40px * 1.25);
+            border-radius: calc(10px * 1.25);
+            display: none;
+            z-index: 1000;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        .fade-in-out {
+            animation: fadeInOut 2s ease-in-out;
+        }
+        @keyframes attackEffect {
+            0% { background-color: rgba(255, 0, 0, 0); }
+            50% { background-color: rgba(255, 0, 0, 0.7); }
+            100% { background-color: rgba(255, 0, 0, 0); }
+        }
+        .attack-effect {
+            animation: attackEffect 0.5s ease-in-out;
+        }
+        #bgm {
+            display: none;
+        }
+        #external-link-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: calc(15px * 1.25) calc(30px * 1.25);
+            font-size: calc(18px * 1.25);
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+            border-radius: calc(8px * 1.25);
+            cursor: pointer;
+            margin-top: calc(20px * 1.25);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        #external-link-button:hover {
+            background: linear-gradient(45deg, #45a049, #4CAF50);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        #external-link-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .external-link-container {
+            text-align: center;
+            margin-top: calc(20px * 1.25);
+            padding: calc(20px * 1.25);
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: calc(10px * 1.25);
+        }
+
+        .external-link-description {
+            color: #ccc;
+            font-size: calc(14px * 1.25);
+            margin-bottom: calc(15px * 1.25);
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+
+        #turn-display {
+            font-size: calc(16px * 1.25);
+            text-align: center;
+            margin-bottom: calc(10px * 1.25);
+            color: #fff;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+
+        .turn-warning {
+            color: #ff6600 !important;
+            font-weight: bold;
+        }
+
+        .turn-critical {
+            color: #ff0000 !important;
+            font-weight: bold;
+            animation: pulse 1s infinite;
+        }
+        /* [신규] 로딩 스크린 스타일 */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #080808;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: #fff;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+
+        #loading-text {
+            font-size: calc(24px * 1.25);
+            margin-bottom: 20px;
+        }
+
+        #loading-progress-container {
+            width: 300px;
+            height: 20px;
+            border: 2px solid #fff;
+        }
+
+        #loading-progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: #4CAF50;
+            transition: width 0.1s linear;
+        }
