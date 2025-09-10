@@ -91,7 +91,7 @@
         }
         
         /* 공격 이펙트 */
-        .attack-effect-near {
+        /*.attack-effect-near {
             position: absolute;
             background: radial-gradient(circle, rgba(255, 100, 0, 0.9), rgba(255, 0, 0, 0.5), transparent);
             border-radius: 50%;
@@ -131,7 +131,7 @@
             0% { opacity: 1; transform: scaleX(0); }
             50% { opacity: 1; transform: scaleX(1); }
             100% { opacity: 0; transform: scaleX(1); }
-        }
+        }*/
         
         #stage-display {
             font-size: calc(18px * 1.25);
@@ -284,3 +284,135 @@
             background-color: #4CAF50;
             transition: width 0.1s linear;
         }
+
+        /* [신규] 범용 이미지 이펙트 스타일 (v0.15b) */
+        .effect-sprite {
+            position: absolute;
+            z-index: 1000;
+            pointer-events: none;
+            object-fit: contain; /* 이미지가 타일 밖으로 튀어나가지 않도록 */
+        }
+
+        /* [신규] 화면 흔들림 애니메이션 (v0.15b) */
+        .shake {
+            animation: screenShake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes screenShake {
+        10%, 90% {
+            transform: translate3d(-5px, 0, 0);
+        }
+        20%, 80% {
+            transform: translate3d(10px, 0, 0);
+        }
+        30%, 50%, 70% {
+            transform: translate3d(-8px, 0, 0);
+        }
+        40%, 60% {
+            transform: translate3d(8px, 0, 0);
+        }
+        }
+        /* [교체] 동적 레이저 이펙트 스타일 (v0.15c) */
+        /* 1. 레이저의 기본 모양과 위치만 정의 (애니메이션 없음) */
+        /* [교체] 동적 레이저 이펙트 스타일 (v0.15d - CSS 변수 사용 최종 버전) */
+        .laser-effect {
+            position: absolute;
+            height: 5px;
+            background: linear-gradient(90deg, 
+                rgba(255, 255, 255, 1) 0%, 
+                rgba(255, 100, 100, 1) 50%, 
+                rgba(255, 50, 50, 0.8) 100%);
+            border-radius: 5px;
+            z-index: 1000;
+            pointer-events: none;
+            
+            /* [핵심 수정] 애니메이션을 직접 적용합니다. */
+            animation: laser-fire 0.4s ease-out;
+        }
+
+        @keyframes laser-fire {
+            /* [핵심 수정] 애니메이션의 모든 프레임에서 JS가 전달한 각도(--laser-angle)를 사용합니다. */
+            0% {
+                transform: rotate(var(--laser-angle)) scaleX(0);
+                transform-origin: 0% 50%;
+                opacity: 1;
+            }
+            20% {
+                transform: rotate(var(--laser-angle)) scaleX(1);
+                transform-origin: 0% 50%;
+                opacity: 1;
+            }
+            100% {
+                transform: rotate(var(--laser-angle)) scaleX(1);
+                transform-origin: 0% 50%;
+                opacity: 0;
+            }
+        }
+
+        /* --- [신규] UI 시스템 스타일 (v0.15b) --- */
+
+        /* 오버레이 (화면을 어둡게 덮는 배경) */
+        .ui-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            z-index: 2000;
+            display: none; /* 평소엔 숨김 */
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 팝업창 스타일 및 애니메이션 */
+        #popup-window {
+            width: 600px;
+            height: 400px;
+            background-image: url('Data/sprites/ui/popup_bg.png'); /* 팀장님께서 만드신 이미지 */
+            background-size: cover;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transform: translateY(100vh); /* 화면 아래쪽에 숨겨진 상태 */
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); /* 부드러운 애니메이션 */
+        }
+        #popup-overlay.active #popup-window {
+            transform: translateY(0); /* active 클래스가 붙으면 제자리로 올라옴 */
+        }
+        #popup-content {
+            display: flex;
+            gap: 20px;
+        }
+        #popup-gif { width: 250px; height: 300px; object-fit: contain; border: 2px solid #333; }
+        #popup-text { flex-grow: 1; font-size: 20px; color: #fff; margin: 0; white-space: pre-wrap; }
+        #popup-buttons { text-align: right; }
+
+        /* 미션 정보창 스타일 및 애니메이션 */
+        #mission-overlay {
+            overflow: hidden; /* 패널이 화면 밖으로 튀어나가지 않도록 */
+        }
+        .mission-panel {
+            position: absolute;
+            transition: transform 0.6s ease-in-out;
+        }
+        #mission-panel1 { /* 왼쪽에서 등장 */
+            width: 40%; height: 80%; left: 0;
+            background-image: url('Data/sprites/ui/panel1_bg.png');
+            transform: translateX(-100%);
+        }
+        #mission-panel2 { /* 오른쪽에서 등장 */
+            width: 35%; height: 80%; right: 0;
+            background-image: url('Data/sprites/ui/panel2_bg.png');
+            transform: translateX(100%);
+        }
+        #mission-panel3 { /* 오른쪽에서 등장 (버튼 패널) */
+            width: 20%; height: 10%; bottom: 5%; right: 0;
+            background-image: url('Data/sprites/ui/panel3_bg.png');
+            transform: translateX(100%);
+        }
+        #mission-overlay.active .mission-panel {
+            transform: translateX(0); /* active 클래스가 붙으면 제자리로 */
+        }
+        /* ... 미션 정보창 내부 콘텐츠 스타일 (png, gif, text, buttons) ... */

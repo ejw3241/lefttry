@@ -24,7 +24,33 @@
     </div>
     <div id="clear-message">Clear!</div>
     <audio id="bgm" loop></audio>
+    <!-- [신규] 팝업창 UI 구조 (v0.15b) -->
+    <div id="popup-overlay" class="ui-overlay">
+        <div id="popup-window">
+            <div id="popup-content">
+                <img id="popup-gif" src="" alt="Popup GIF">
+                <p id="popup-text"></p>
+            </div>
+            <div id="popup-buttons">
+                <!-- 버튼들은 JavaScript가 동적으로 생성합니다 -->
+            </div>
+        </div>
+    </div>
 
+    <!-- [신규] 미션 정보창 UI 구조 (v0.15b) -->
+    <div id="mission-overlay" class="ui-overlay">
+        <div id="mission-panel1" class="mission-panel">
+            <img id="mission-png" src="" alt="Mission Image">
+            <p id="mission-text"></p>
+        </div>
+        <div id="mission-panel2" class="mission-panel">
+            <img id="mission-gif" src="" alt="Mission GIF">
+        </div>
+        <div id="mission-panel3" class="mission-panel">
+            <button id="mission-prev-btn">[Prev]</button>
+            <button id="mission-next-btn">[Next]</button>
+        </div>
+    </div>
     <script async src="tst22_v0.15a.js"></script>
 </body>
 </html>

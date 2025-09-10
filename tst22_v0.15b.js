@@ -153,7 +153,36 @@
 
             '4W': 'Data/sprites/4W.png', // 파란색 벽
             '4I': 'Data/sprites/4I.png', // 파란색 무적 벽
+            //--
+            'effect_near_a': 'Data/sprites/effect_near_a.png', // 근거리 공격 이펙트 a
+            'effect_near_b': 'Data/sprites/effect_near_b.png', // 근거리 공격 이펙트 b
+            //'effect_far_a': 'Data/sprites/effect_far_a.png', // 원거리 공격 이펙트 a
+            //'effect_far_b': 'Data/sprites/effect_far_b.png', // 원거리 공격 이펙트 b
+            'effect_space_a': 'Data/sprites/effect_space_a.png', // SPACE 이펙트 a
+            'effect_space_b': 'Data/sprites/effect_space_b.png', // SPACE 이펙트 b
+            'effect_tab_a': 'Data/sprites/effect_tab_a.png', // TAB 이펙트 a
+            'effect_tab_b': 'Data/sprites/effect_tab_b.png', // TAB 이펙트 b
             
+        };
+
+
+        // [신규] 팝업 데이터 (v0.15b)
+        // 스테이지 번호를 key로 사용합니다.
+        // [교체] 팝업 데이터 (v0.15c - 누락된 데이터 추가)
+        // [교체] 팝업 데이터 (v0.15c - 모든 팝업 스테이지 데이터 추가)
+        const POPUP_DATA = {
+            0: [ // 1번째 스테이지 (인덱스 0)
+                { gif: 'Data/sprites/ui/obj_move.gif', text: 'Left-Try에 오신 것을 환영합니다!\n\n이 게임은 당신의 창의적인 문제 해결 능력을 시험할 것입니다.' }
+            ],
+            3: [ // 4번째 스테이지 (인덱스 3)
+                { gif: 'Data/sprites/ui/obj_space.gif', text: '새로운 규칙: [SPACE]\n\n키보드의 SPACE 키를 누르면 맵의 가장 왼쪽에 있는 물체를 제거할 수 있습니다.' },
+                { gif: 'Data/sprites/ui/obj_left.gif', text: '가장 왼쪽의 물체는 x좌표가 가장 작고, 같다면 y좌표가 가장 작은 물체를 의미합니다.' }
+            ],
+            6: [ // 7번째 스테이지 (인덱스 6)
+                { gif: 'Data/sprites/ui/intro_blue.gif', text: '파란색 물체는 모든 규칙에 면역입니다.\n\n가장 왼쪽에 있을 경우 Space와 Tab 키를 차단합니다.' },
+                { gif: 'Data/sprites/ui/intro_attack.gif', text: '초록색 공격 유닛(1A, 1B)은 마우스 클릭으로 다른 물체를 공격하여 파괴할 수 있습니다.\n\n파란색 물체를 제거할 유일한 방법입니다.' }
+            ]
+            // popup: true가 있는 다른 스테이지가 있다면 여기에 추가하세요.
         };
 
         // --- 스테이지 데이터 ---
@@ -177,7 +206,8 @@
                 tooltip: [
                     'P-1 Stage.',
                     'Test A, B'
-                ]
+                ],
+                popup: true
             },
                                     {
                 map: [
@@ -187,7 +217,7 @@
                     ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
                     ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
                     ['--', '--', '--', '--', '--', '3A', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
-                    ['--', '--', '--', '--', '--', '--', '3A', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '3A', '--', '--', '--', '--', '--', '--', '--', '--', '1B', '--', '--', '--', '--', '--'],
                     ['--', '--', '--', '--', '--', '--', '--', '3A', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
                     ['--', '--', '--', '--', '--', '--', '--', '--', '00', '00', '00', '00', '00', '--', '--', '--', '--', '--', '--', '--', '--'],
                     ['--', '--', '--', '--', '--', '--', '--', '--', '00', '--', '--', '--', '00', '--', '--', '--', '--', '--', '--', '--', '--'],
@@ -224,6 +254,7 @@
                     '모든 규칙은 왼쪽부터 적용됩니다.',
                     '"SPACE"키로 물체를 부술 수 있습니다.'
                 ],
+                popup: true,
                 turnLimit: 18
             },
             {
@@ -271,6 +302,7 @@
                     '마우스 좌클릭으로 물체를 부술 수 있습니다. (공격 가능 물체만)',
                     '마우스 좌클릭으로 어떤 물체를 조작할지 선택할 수 있습니다.'
                 ],
+                popup: true,
                 turnLimit: 30
             },
             {
@@ -492,38 +524,102 @@ function isMoveValid(row, col) {
         }
 
         // --- 공격 이펙트 생성 ---
-        function createAttackEffect(targetRow, targetCol, attackType, attackerColor = 'red') {
-            const gameContainer = document.getElementById('game-container');
-            const tile = grid.querySelector(`.tile[data-row='${targetRow}'][data-col='${targetCol}']`);
-            if (!tile || !gameContainer) return;
+// [교체] 범용 이미지 이펙트 생성 함수 (v0.15b - 사이즈 조절 기능 추가)
+function createEffect(targetRow, targetCol, effectBaseName, duration = 300, frameRate = 150, scale = 1.5) {
+    const gameContainer = document.getElementById('game-container');
+    const tile = grid.querySelector(`.tile[data-row='${targetRow}'][data-col='${targetCol}']`);
+    if (!tile || !gameContainer) return;
 
-            const tileRect = tile.getBoundingClientRect();
-            const containerRect = gameContainer.getBoundingClientRect();
+    const effectImg = document.createElement('img');
+    effectImg.classList.add('effect-sprite');
 
-            const effectElement = document.createElement('div');
-            const colorSuffix = attackerColor === 'blue' ? '-blue' : '';
-            effectElement.className = attackType === 'near' ? `attack-effect${colorSuffix}-near` : `attack-effect${colorSuffix}-far`;
-            
-            effectElement.style.position = 'absolute';
-            effectElement.style.left = `${tileRect.left - containerRect.left}px`;
-            effectElement.style.top = `${tileRect.top - containerRect.top}px`;
-            
-            if (attackType === 'near') {
-                effectElement.style.width = `${tileRect.width * 2}px`;
-                effectElement.style.height = `${tileRect.height * 2}px`;
-                effectElement.style.transform = 'translate(-25%, -25%)';
-            } else {
-                effectElement.style.width = `${tileRect.width}px`;
-                effectElement.style.height = `${tileRect.height / 4}px`;
-                effectElement.style.top = `${tileRect.top - containerRect.top + tileRect.height * 0.375}px`;
-            }
-            
-            gameContainer.appendChild(effectElement);
+    let currentFrame = 'a';
+    // [중요] 이펙트 이미지가 존재하지 않을 경우 오류를 방지하는 방어 코드 추가
+    if (!preloadedImagesCache[`${effectBaseName}_${currentFrame}`]) {
+        console.warn(`이펙트 이미지 없음: ${effectBaseName}_a`);
+        return;
+    }
+    effectImg.src = preloadedImagesCache[`${effectBaseName}_${currentFrame}`].src;
 
-            setTimeout(() => {
-                if (effectElement.parentNode) effectElement.remove();
-            }, attackType === 'near' ? 1500 : 300);
+    const tileRect = tile.getBoundingClientRect();
+    const containerRect = gameContainer.getBoundingClientRect();
+
+    // --- [핵심 수정] 사이즈 및 위치 계산 ---
+    const newWidth = tileRect.width * scale;
+    const newHeight = tileRect.height * scale;
+    const newLeft = (tileRect.left - containerRect.left) - (newWidth - tileRect.width) / 2;
+    const newTop = (tileRect.top - containerRect.top) - (newHeight - tileRect.height) / 2;
+
+    effectImg.style.position = 'absolute';
+    effectImg.style.left = `${newLeft}px`;
+    effectImg.style.top = `${newTop}px`;
+    effectImg.style.width = `${newWidth}px`;
+    effectImg.style.height = `${newHeight}px`;
+    // --- 수정 끝 ---
+
+    gameContainer.appendChild(effectImg);
+
+    const animationInterval = setInterval(() => {
+        currentFrame = currentFrame === 'a' ? 'b' : 'a';
+        effectImg.src = preloadedImagesCache[`${effectBaseName}_${currentFrame}`].src;
+    }, frameRate);
+
+    setTimeout(() => {
+        clearInterval(animationInterval);
+        if (effectImg.parentNode) {
+            effectImg.remove();
         }
+    }, duration);
+}
+
+// [신규] 화면 흔들림 이펙트 함수 (v0.15b)
+function triggerScreenShake(duration = 300) {
+    const gameWrapper = document.getElementById('game-wrapper');
+    gameWrapper.classList.add('shake');
+    setTimeout(() => {
+        gameWrapper.classList.remove('shake');
+    }, duration);
+}
+// [신규] 동적 원거리 공격(레이저) 이펙트 함수 (v0.15b)
+// [교체] 동적 원거리 공격(레이저) 이펙트 함수 (v0.15c - 렌더링 순서 보장)
+// [교체] 동적 원거리 공격(레이저) 이펙트 함수 (v0.15d - CSS 변수 사용 최종 버전)
+function createLaserEffect(attackerRow, attackerCol, targetRow, targetCol, duration = 400) {
+    const gameContainer = document.getElementById('game-container');
+    const attackerTile = grid.querySelector(`.tile[data-row='${attackerRow}'][data-col='${attackerCol}']`);
+    const targetTile = grid.querySelector(`.tile[data-row='${targetRow}'][data-col='${targetCol}']`);
+    if (!attackerTile || !targetTile || !gameContainer) return;
+
+    const containerRect = gameContainer.getBoundingClientRect();
+    
+    const startRect = attackerTile.getBoundingClientRect();
+    const endRect = targetTile.getBoundingClientRect();
+    const startX = startRect.left - containerRect.left + startRect.width / 2;
+    const startY = startRect.top - containerRect.top + startRect.height / 2;
+    const endX = endRect.left - containerRect.left + endRect.width / 2;
+    const endY = endRect.top - containerRect.top + endRect.height / 2;
+
+    const deltaX = endX - startX;
+    const deltaY = endY - startY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+
+    const laser = document.createElement('div');
+    laser.className = 'laser-effect'; // [수정] 다시 단일 클래스로 돌아갑니다.
+    
+    laser.style.position = 'absolute';
+    laser.style.left = `${startX}px`;
+    laser.style.top = `${startY}px`;
+    laser.style.width = `${distance}px`;
+
+    // [핵심 수정] JavaScript에서 CSS로 각도 '메시지'를 전달합니다.
+    laser.style.setProperty('--laser-angle', `${angle}deg`);
+
+    gameContainer.appendChild(laser);
+
+    setTimeout(() => {
+        if (laser.parentNode) laser.remove();
+    }, duration);
+}
 
         // --- 턴 제한 체크 함수 ---
         function checkTurnLimit() {
@@ -599,7 +695,9 @@ function processEnemyNearRange(obj) {
         // 3.1. 공격
         if (Math.abs(currentTarget.row - obj.row) <= 1 && Math.abs(currentTarget.col - obj.col) <= 1) {
             gameState.objects = gameState.objects.filter(o => o.id !== currentTarget.id);
-            createAttackEffect(currentTarget.row, currentTarget.col, 'near', obj.color);
+            // 기존: createAttackEffect(currentTarget.row, currentTarget.col, 'near', obj.color);
+            // 수정:
+            createEffect(currentTarget.row, currentTarget.col, 'effect_near', 500, 120);
             obj.targetId = null;
             obj.isTracking = false;
             if (currentTarget.id === gameState.selectedId) {
@@ -708,7 +806,10 @@ function processEnemyLongRange(obj) {
         if (obj.turnsSinceRecognition >= 2) { // [수정]
             addHistory('attack', { attacker: { id: obj.id, type: obj.type }, target: { ...currentTarget } });
             gameState.objects = gameState.objects.filter(o => o.id !== currentTarget.id);
-            createAttackEffect(currentTarget.row, currentTarget.col, 'far', obj.color);
+            // 기존: createAttackEffect(currentTarget.row, currentTarget.col, 'far', obj.color);
+            // 기존: createEffect(currentTarget.row, currentTarget.col, 'effect_far', 300, 100);
+            // 수정:
+            createLaserEffect(obj.row, obj.col, currentTarget.row, currentTarget.col);
             obj.targetId = null;
             obj.isTracking = false;
             obj.turnsSinceRecognition = 0; // [수정] 공격 후 리셋
@@ -733,50 +834,59 @@ function processEnemyLongRange(obj) {
 //        }
         
         // --- 게임 로직 함수 ---
-        // [교체] loadStage 함수
-function loadStage() {
-    // [개선] setupInitialState를 호출하여 게임 상태를 깨끗하게 리셋합니다.
-    setupInitialState(gameState.currentStageIndex);
-    
-    const stage = stages[gameState.currentStageIndex];
-    
-    // 객체 생성 로직 (v0.14b와 동일, gameState 참조만 수정)
-    for (let row = 0; row < stage.map.length; row++) {
-        for (let col = 0; col < stage.map[0].length; col++) {
-            const code = stage.map[row][col];
-            if (code !== '00' && code !== '--') {
-                const type = code.charAt(1);
-                const colorNumber = parseInt(code.charAt(0));
-                let color;
-                switch(colorNumber) {
-                    case 1: color = 'green'; break;
-                    case 2: color = 'yellow'; break;
-                    case 3: color = 'red'; break;
-                    case 4: color = 'blue'; break;
+        // [교체] loadStage 함수 (v0.15c - 안정성 강화)
+        function loadStage(stageIndex) {
+            // 함수가 호출될 때 받은 stageIndex로 gameState를 확실하게 설정합니다.
+            setupInitialState(stageIndex); 
+            
+            const stage = stages[gameState.currentStageIndex];
+            if (!stage) {
+                console.error(`Stage not found for index: ${stageIndex}`);
+                return;
+            }
+            
+            // ... (기존 객체 생성 로직은 동일) ...
+            for (let row = 0; row < stage.map.length; row++) {
+                for (let col = 0; col < stage.map[0].length; col++) {
+                    const code = stage.map[row][col];
+                    if (code !== '00' && code !== '--') {
+                        const type = code.charAt(1);
+                        const colorNumber = parseInt(code.charAt(0));
+                        let color;
+                        switch(colorNumber) {
+                            case 1: color = 'green'; break;
+                            case 2: color = 'yellow'; break;
+                            case 3: color = 'red'; break;
+                            case 4: color = 'blue'; break;
+                        }
+                        const newObj = {
+                            id: gameState.nextObjectId++,
+                            row: row, col: col, type: type, color: color, code: code,
+                            targetId: null, isTracking: false, turnsSinceRecognition: 0,
+                            spriteState: 'a', direction: 'B'
+                        };
+                        if (!['P', 'A', 'B'].includes(type)) {
+                            delete newObj.spriteState;
+                            delete newObj.direction;
+                        }
+                        gameState.objects.push(newObj);
+                    }
                 }
-                const newObj = {
-                    id: gameState.nextObjectId++,
-                    row: row, col: col, type: type, color: color, code: code,
-                    targetId: null, isTracking: false, turnsSinceRecognition: 0,
-                    spriteState: 'a', direction: 'B'
-                };
-                if (!['P', 'A', 'B'].includes(type)) {
-                    delete newObj.spriteState;
-                    delete newObj.direction;
-                }
-                gameState.objects.push(newObj);
+            }
+
+            const player = gameState.objects.find(o => o.type === 'P' && o.color === 'green');
+            if (player) {
+                gameState.selectedId = player.id;
+            }
+            
+            addHistory('load', {});
+            renderMap();
+
+            // 팝업이 있는 스테이지인지 확인하고 팝업을 띄웁니다.
+            if (stage.popup) {
+                showPopup();
             }
         }
-    }
-
-    const player = gameState.objects.find(o => o.type === 'P' && o.color === 'green');
-    if (player) {
-        gameState.selectedId = player.id;
-    }
-    
-    addHistory('load', {}); // [개선] 상태 저장 로직 간소화
-    renderMap();
-}
 
 
 // [교체 대상] renderMap 함수
@@ -1070,6 +1180,13 @@ document.addEventListener('keydown', (e) => {
         return;
     }
 
+    // [신규] F10 키로 미션 정보창을 토글합니다.
+    if (e.key === 'F10') {
+        e.preventDefault();
+        toggleMissionObjectives();
+        return;
+    }
+
     const key = e.key.toLowerCase();
 
     if (key === 'r') {
@@ -1133,7 +1250,14 @@ document.addEventListener('keydown', (e) => {
             return;
         }
         if (leftmost) {
+            // [신규] Space 이펙트 생성
+            createEffect(leftmost.row, leftmost.col, 'effect_space', 400, 100);
+            
             gameState.objects = gameState.objects.filter(o => o.id !== leftmost.id);
+            
+            // [신규] 화면 흔들림 효과
+            triggerScreenShake(300);
+
             if (leftmost.id === gameState.selectedId) {
                 const newSelection = gameState.objects.find(o => o.color === 'green' && o.type !== 'F') || null;
                 gameState.selectedId = newSelection ? newSelection.id : null;
@@ -1150,6 +1274,9 @@ document.addEventListener('keydown', (e) => {
             return;
         }
         if (leftmost) {
+            // [신규] Tab 이펙트 생성
+            createEffect(leftmost.row, leftmost.col, 'effect_tab', 400, 100);
+
             const colors = ['green', 'yellow', 'red'];
             const currentIndex = colors.indexOf(leftmost.color);
             if (currentIndex !== -1) {
@@ -1201,7 +1328,14 @@ grid.addEventListener('click', (e) => {
             const target = gameState.objects.find(o => o.row === row && o.col === col && o.type !== 'I' && o.type !== 'F');
             if (target) {
                 gameState.objects = gameState.objects.filter(o => o.id !== target.id);
-                createAttackEffect(row, col, selectedObj.type === 'A' ? 'near' : 'far', 'green');
+                // 기존: createAttackEffect(row, col, selectedObj.type === 'A' ? 'near' : 'far', 'green');
+                // 기존: const effectType = selectedObj.type === 'A' ? 'effect_near' : 'effect_far';
+                // 기존: createEffect(row, col, effectType, 500, 120);
+                if (selectedObj.type === 'A') {
+                    createEffect(row, col, 'effect_near', 500, 120, 1.5);
+                } else { // 'B' 타입 (원거리)
+                    createLaserEffect(selectedObj.row, selectedObj.col, row, col);
+                }
                 
                 if (target.id === gameState.selectedId) {
                     const newSelection = gameState.objects.find(o => o.color === 'green' && o.type !== 'F') || null;
@@ -1324,5 +1458,105 @@ async function main() {
     setupInitialState(0);
     loadStage();
 }
+
+// --- [신규] UI 제어 함수들 (v0.15b) ---
+let uiState = {
+    popupPageIndex: 0,
+    missionPageIndex: 0,
+};
+
+function showPopup() {
+    gameState.flowState = 'paused'; // [중요] 게임 조작 차단
+    const popupData = POPUP_DATA[gameState.currentStageIndex];
+    if (!popupData) return;
+
+    uiState.popupPageIndex = 0;
+    updatePopupContent();
+
+    const overlay = document.getElementById('popup-overlay');
+    overlay.style.display = 'flex';
+    setTimeout(() => overlay.classList.add('active'), 10); // 애니메이션 시작
+}
+
+function hidePopup() {
+    const overlay = document.getElementById('popup-overlay');
+    overlay.classList.remove('active');
+    setTimeout(() => {
+        overlay.style.display = 'none';
+        gameState.flowState = 'playing'; // [중요] 게임 조작 허용
+    }, 500); // CSS transition 시간과 일치
+}
+
+function updatePopupContent() {
+    const popupData = POPUP_DATA[gameState.currentStageIndex];
+    const currentPage = popupData[uiState.popupPageIndex];
+    
+    document.getElementById('popup-gif').src = currentPage.gif;
+    document.getElementById('popup-text').textContent = currentPage.text;
+
+    const buttonsContainer = document.getElementById('popup-buttons');
+    buttonsContainer.innerHTML = ''; // 버튼 초기화
+
+    if (uiState.popupPageIndex > 0) {
+        const prevBtn = document.createElement('button');
+        prevBtn.textContent = '[Prev]';
+        prevBtn.onclick = () => { uiState.popupPageIndex--; updatePopupContent(); };
+        buttonsContainer.appendChild(prevBtn);
+    }
+    if (uiState.popupPageIndex < popupData.length - 1) {
+        const nextBtn = document.createElement('button');
+        nextBtn.textContent = '[Next]';
+        nextBtn.onclick = () => { uiState.popupPageIndex++; updatePopupContent(); };
+        buttonsContainer.appendChild(nextBtn);
+    } else {
+        const okBtn = document.createElement('button');
+        okBtn.textContent = '[Ok]';
+        okBtn.onclick = hidePopup;
+        buttonsContainer.appendChild(okBtn);
+    }
+}
+
+function toggleMissionObjectives() {
+    const overlay = document.getElementById('mission-overlay');
+    if (overlay.style.display === 'flex') {
+        // 창 닫기
+        overlay.classList.remove('active');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            gameState.flowState = 'playing';
+        }, 600);
+    } else {
+        // 창 열기
+        gameState.flowState = 'paused';
+        uiState.missionPageIndex = 0;
+        updateMissionContent();
+        overlay.style.display = 'flex';
+        setTimeout(() => overlay.classList.add('active'), 10);
+    }
+}
+
+function updateMissionContent() {
+    const currentPage = MISSION_OBJECTIVES_DATA[uiState.missionPageIndex];
+    document.getElementById('mission-png').src = currentPage.png;
+    document.getElementById('mission-text').textContent = currentPage.text;
+    document.getElementById('mission-gif').src = currentPage.gif;
+    
+    document.getElementById('mission-prev-btn').style.visibility = uiState.missionPageIndex > 0 ? 'visible' : 'hidden';
+    document.getElementById('mission-next-btn').style.visibility = uiState.missionPageIndex < MISSION_OBJECTIVES_DATA.length - 1 ? 'visible' : 'hidden';
+}
+
+// 미션 정보창 버튼 이벤트 리스너
+document.getElementById('mission-prev-btn').onclick = () => {
+    if (uiState.missionPageIndex > 0) {
+        uiState.missionPageIndex--;
+        updateMissionContent();
+    }
+};
+document.getElementById('mission-next-btn').onclick = () => {
+    if (uiState.missionPageIndex < MISSION_OBJECTIVES_DATA.length - 1) {
+        uiState.missionPageIndex++;
+        updateMissionContent();
+    }
+};
 
 main();
