@@ -170,20 +170,32 @@
         // 스테이지 번호를 key로 사용합니다.
         // [교체] 팝업 데이터 (v0.15c - 누락된 데이터 추가)
         // [교체] 팝업 데이터 (v0.15c - 모든 팝업 스테이지 데이터 추가)
-        const POPUP_DATA = {
-            0: [ // 1번째 스테이지 (인덱스 0)
-                { gif: 'Data/sprites/ui/obj_move.gif', text: 'Left-Try에 오신 것을 환영합니다!\n\n이 게임은 당신의 창의적인 문제 해결 능력을 시험할 것입니다.' }
-            ],
-            3: [ // 4번째 스테이지 (인덱스 3)
-                { gif: 'Data/sprites/ui/obj_space.gif', text: '새로운 규칙: [SPACE]\n\n키보드의 SPACE 키를 누르면 맵의 가장 왼쪽에 있는 물체를 제거할 수 있습니다.' },
-                { gif: 'Data/sprites/ui/obj_left.gif', text: '가장 왼쪽의 물체는 x좌표가 가장 작고, 같다면 y좌표가 가장 작은 물체를 의미합니다.' }
-            ],
-            6: [ // 7번째 스테이지 (인덱스 6)
-                { gif: 'Data/sprites/ui/intro_blue.gif', text: '파란색 물체는 모든 규칙에 면역입니다.\n\n가장 왼쪽에 있을 경우 Space와 Tab 키를 차단합니다.' },
-                { gif: 'Data/sprites/ui/intro_attack.gif', text: '초록색 공격 유닛(1A, 1B)은 마우스 클릭으로 다른 물체를 공격하여 파괴할 수 있습니다.\n\n파란색 물체를 제거할 유일한 방법입니다.' }
-            ]
-            // popup: true가 있는 다른 스테이지가 있다면 여기에 추가하세요.
-        };
+// --- [신규] UI 콘텐츠 데이터 (v0.15b) ---
+
+// [신규] 팝업 데이터 (v0.15b)
+// 스테이지 번호를 key로 사용합니다.
+const POPUP_DATA = {
+    0: [ // 1번째 스테이지 (인덱스 0)
+        { gif: 'Data/sprites/ui/obj_move.gif', text: 'Left-Try에 오신 것을 환영합니다!\n\n이 게임은 당신의 창의적인 문제 해결 능력을 시험할 것입니다.' }
+    ],
+    3: [ // 4번째 스테이지 (인덱스 3)
+        { gif: 'Data/sprites/ui/obj_space.gif', text: '새로운 규칙: [SPACE]\n\n키보드의 SPACE 키를 누르면 맵의 가장 왼쪽에 있는 물체를 제거할 수 있습니다.' },
+        { gif: 'Data/sprites/ui/obj_left.gif', text: '가장 왼쪽의 물체는 x좌표가 가장 작고, 같다면 y좌표가 가장 작은 물체를 의미합니다.' }
+    ],
+    6: [ // 7번째 스테이지 (인덱스 6)
+        { gif: 'Data/sprites/ui/intro_blue.gif', text: '파란색 물체는 모든 규칙에 면역입니다.\n\n가장 왼쪽에 있을 경우 Space와 Tab 키를 차단합니다.' },
+        { gif: 'Data/sprites/ui/intro_attack.gif', text: '초록색 공격 유닛(1A, 1B)은 마우스 클릭으로 다른 물체를 공격하여 파괴할 수 있습니다.\n\n파란색 물체를 제거할 유일한 방법입니다.' }
+    ]
+};
+
+// [신규] 미션 정보 데이터 (v0.15b)
+const MISSION_OBJECTIVES_DATA = [
+    { png: 'Data/sprites/ui/obj_move.png', gif: 'Data/sprites/ui/obj_move.gif', text: '기본 조작: WASD\n\n초록색(1P) 플레이어를 움직여 노란색(2F) 도착점에 도달하면 승리합니다.' },
+    { png: 'Data/sprites/ui/obj_space.png', gif: 'Data/sprites/ui/obj_space.gif', text: '제거 규칙: SPACE\n\n가장 왼쪽의 물체를 제거합니다. 이를 이용해 길을 만들 수 있습니다.' },
+    { png: 'Data/sprites/ui/obj_tab.png', gif: 'Data/sprites/ui/obj_tab.gif', text: '색상 변경: TAB\n\n가장 왼쪽 물체의 색을 초록→노랑→빨강 순으로 바꿉니다.' },
+    { png: 'Data/sprites/ui/obj_attack.png', gif: 'Data/sprites/ui/obj_attack.gif', text: '공격: 마우스 클릭\n\n초록색 공격 유닛으로 다른 물체를 파괴할 수 있습니다.' },
+    { png: 'Data/sprites/ui/obj_blue.png', gif: 'Data/sprites/ui/obj_blue.gif', text: '파란 물체 규칙\n\n파란색 물체는 Tab으로 색을 바꿀 수 없으며, 가장 왼쪽에 있을 때 Space/Tab을 막습니다.' }
+];
 
         // --- 스테이지 데이터 ---
         const stages = [
@@ -835,17 +847,23 @@ function processEnemyLongRange(obj) {
         
         // --- 게임 로직 함수 ---
         // [교체] loadStage 함수 (v0.15c - 안정성 강화)
+        // [교체] loadStage 함수 (v0.15d - 디버깅 로그 추가)
+        // [교체] loadStage 함수 (v0.15e - 매개변수 안정성 강화)
         function loadStage(stageIndex) {
-            // 함수가 호출될 때 받은 stageIndex로 gameState를 확실하게 설정합니다.
-            setupInitialState(stageIndex); 
+            // [핵심 수정] stageIndex가 전달되지 않았다면, 현재 gameState의 인덱스를 사용합니다.
+            // 이렇게 하면 어떤 상황에서 호출되어도 안전하게 작동합니다.
+            const indexToLoad = (stageIndex !== undefined) ? stageIndex : gameState.currentStageIndex;
+
+            console.log(`[DEBUG] ➡️ loadStage 호출됨. 로드할 인덱스: ${indexToLoad}`);
+            setupInitialState(indexToLoad); 
             
             const stage = stages[gameState.currentStageIndex];
             if (!stage) {
-                console.error(`Stage not found for index: ${stageIndex}`);
+                console.error(`[DEBUG] ❌ CRITICAL: stages[${indexToLoad}] 에서 스테이지 데이터를 찾을 수 없습니다!`);
                 return;
             }
             
-            // ... (기존 객체 생성 로직은 동일) ...
+            // ... (이하 객체 생성 로직은 동일) ...
             for (let row = 0; row < stage.map.length; row++) {
                 for (let col = 0; col < stage.map[0].length; col++) {
                     const code = stage.map[row][col];
@@ -860,31 +878,27 @@ function processEnemyLongRange(obj) {
                             case 4: color = 'blue'; break;
                         }
                         const newObj = {
-                            id: gameState.nextObjectId++,
-                            row: row, col: col, type: type, color: color, code: code,
+                            id: gameState.nextObjectId++, row: row, col: col, type: type, color: color, code: code,
                             targetId: null, isTracking: false, turnsSinceRecognition: 0,
                             spriteState: 'a', direction: 'B'
                         };
-                        if (!['P', 'A', 'B'].includes(type)) {
-                            delete newObj.spriteState;
-                            delete newObj.direction;
-                        }
+                        if (!['P', 'A', 'B'].includes(newObj.type)) { delete newObj.spriteState; delete newObj.direction; }
                         gameState.objects.push(newObj);
                     }
                 }
             }
 
             const player = gameState.objects.find(o => o.type === 'P' && o.color === 'green');
-            if (player) {
-                gameState.selectedId = player.id;
-            }
+            if (player) { gameState.selectedId = player.id; }
             
             addHistory('load', {});
             renderMap();
 
-            // 팝업이 있는 스테이지인지 확인하고 팝업을 띄웁니다.
             if (stage.popup) {
+                console.log(`[DEBUG] ✅ stage.popup 플래그 발견! showPopup()을 호출합니다.`);
                 showPopup();
+            } else {
+                console.log(`[DEBUG] ℹ️ stage.popup 플래그 없음. 팝업을 호출하지 않습니다.`);
             }
         }
 
@@ -1176,13 +1190,11 @@ document.addEventListener('keydown', (e) => {
         bgm.play().catch(err => console.warn('BGM 재생 실패:', err));
     }
 
-    if (gameState.flowState === 'won') {
-        return;
-    }
+    if (gameState.flowState === 'won') { return; }
 
-    // [신규] F10 키로 미션 정보창을 토글합니다.
     if (e.key === 'F10') {
         e.preventDefault();
+        console.log(`[DEBUG] ➡️ F10 키 감지! toggleMissionObjectives()를 호출합니다.`);
         toggleMissionObjectives();
         return;
     }
@@ -1452,11 +1464,11 @@ Object.entries(objectImages).forEach(([key, path]) => {
 
 
 // --- [신규] 메인 게임 실행 함수 ---
+// [교체] 메인 게임 실행 함수 (v0.15e)
 async function main() {
     await preloadImages();
-    // [개선] setupInitialState를 먼저 호출하여 gameState를 생성합니다.
-    setupInitialState(0);
-    loadStage();
+    // main 함수에서는 항상 0번 스테이지부터 시작하므로, 명시적으로 0을 전달합니다.
+    loadStage(0); 
 }
 
 // --- [신규] UI 제어 함수들 (v0.15b) ---
@@ -1465,17 +1477,34 @@ let uiState = {
     missionPageIndex: 0,
 };
 
+// [교체] showPopup 함수 (v0.15d - 디버깅 로그 추가)
 function showPopup() {
-    gameState.flowState = 'paused'; // [중요] 게임 조작 차단
+    console.log('[POPUP] ➡️ showPopup 함수 시작.');
+    gameState.flowState = 'paused';
+    console.log(`[POPUP] ℹ️ 게임 상태를 'paused'로 변경.`);
+
     const popupData = POPUP_DATA[gameState.currentStageIndex];
-    if (!popupData) return;
+    if (!popupData) {
+        console.error(`[POPUP] ❌ CRITICAL: POPUP_DATA[${gameState.currentStageIndex}] 에서 팝업 데이터를 찾을 수 없습니다! 게임이 멈춥니다.`);
+        return;
+    }
+    console.log(`[POPUP] ✅ 팝업 데이터 찾음. (총 ${popupData.length} 페이지)`);
 
     uiState.popupPageIndex = 0;
     updatePopupContent();
 
     const overlay = document.getElementById('popup-overlay');
+    if (!overlay) {
+        console.error('[POPUP] ❌ CRITICAL: HTML에서 "popup-overlay" 요소를 찾을 수 없습니다!');
+        return;
+    }
+    console.log('[POPUP] ✅ 오버레이 요소 찾음.');
+
     overlay.style.display = 'flex';
-    setTimeout(() => overlay.classList.add('active'), 10); // 애니메이션 시작
+    setTimeout(() => {
+        overlay.classList.add('active');
+        console.log('[POPUP] ✅ "active" 클래스 추가하여 애니메이션 시작.');
+    }, 10);
 }
 
 function hidePopup() {
@@ -1516,22 +1545,32 @@ function updatePopupContent() {
     }
 }
 
+// [교체] toggleMissionObjectives 함수 (v0.15d - 디버깅 로그 추가)
 function toggleMissionObjectives() {
+    console.log('[MISSION] ➡️ toggleMissionObjectives 함수 시작.');
     const overlay = document.getElementById('mission-overlay');
+    if (!overlay) {
+        console.error('[MISSION] ❌ CRITICAL: HTML에서 "mission-overlay" 요소를 찾을 수 없습니다!');
+        return;
+    }
+
     if (overlay.style.display === 'flex') {
-        // 창 닫기
+        console.log('[MISSION] ℹ️ 미션 창을 닫습니다.');
         overlay.classList.remove('active');
         setTimeout(() => {
             overlay.style.display = 'none';
             gameState.flowState = 'playing';
         }, 600);
     } else {
-        // 창 열기
+        console.log('[MISSION] ℹ️ 미션 창을 엽니다.');
         gameState.flowState = 'paused';
         uiState.missionPageIndex = 0;
         updateMissionContent();
         overlay.style.display = 'flex';
-        setTimeout(() => overlay.classList.add('active'), 10);
+        setTimeout(() => {
+            overlay.classList.add('active');
+            console.log('[MISSION] ✅ "active" 클래스 추가하여 애니메이션 시작.');
+        }, 10);
     }
 }
 
