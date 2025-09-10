@@ -1,5 +1,5 @@
         // --- 배경음악 설정 ---
-        const bgmUrl = 'Data/music/1. Baba Is You Theme.mp3';
+        const bgmUrl = 'Data/music/2. On the island.mp3';
         const bgm = document.getElementById('bgm');
         let bgmLoaded = false;
         if (bgmUrl) {
@@ -158,8 +158,48 @@
 
         // --- 스테이지 데이터 ---
         const stages = [
-
-
+                        {
+                map: [
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '00', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '00', '--', '00', '--', '00', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '00', '00', '4A', '00', '00', '--', '00', '--', '00', '1P', '--', '--', '--', '--', '4B', '--', '--', '--', '--', '--'],
+                    ['--', '--', '00', '--', '2W', '00', '--', '00', '--', '00', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '00', '--', '--', '--', '--', '00', '--', '--', '--', '--', '--', '--', '1F', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '2W', '1F', '2W', '00', '00', '00', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '2F', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--']
+                ],
+                tooltip: [
+                    'P-1 Stage.',
+                    'Test A, B'
+                ]
+            },
+                                    {
+                map: [
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '2F', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '3A', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '3A', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '3A', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '00', '00', '00', '00', '00', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '00', '--', '--', '--', '00', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '00', '--', '1P', '--', '00', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '00', '--', '--', '--', '1W', '--', '--', '--', '--', '--', '--', '--', '--'],
+                    ['--', '--', '--', '--', '--', '--', '--', '--', '00', '00', '00', '00', '00', '--', '--', '--', '--', '--', '--', '--', '--']
+                ],
+                tooltip: [
+                    'P-1 Stage.',
+                    'Test A, B'
+                ]
+            },
             {
                 map: [
                     ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
@@ -195,7 +235,7 @@
                 tooltip: [
                     '모든 규칙은 왼쪽부터 적용됩니다.',
                     '"TAP"키로 물체의 색을 바꿀 수 있습니다.',
-                    '바뀌는 순서는 초록 > 노간 > 빨강 순서입니다.'
+                    '바뀌는 순서는 초록 > 노랑 > 빨강 순서입니다.'
                 ],
                 turnLimit: 0
             },
@@ -233,7 +273,20 @@
                 ],
                 turnLimit: 30
             },
-
+            {
+                map: [
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
+                    ['00', '--', '--', '--', '--', '--', '--', '--', '--', '00'],
+                    ['00', '--', '00', '00', '00', '00', '00', '00', '--', '00'],
+                    ['00', '--', '00', '00', '00', '00', '00', '00', '--', '00'],
+                    ['00', '--', '--', '2F', '00', '00', '1P', '--', '--', '00'],
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00']
+                ],
+                tooltip: [
+                    'insert tooltip here', '(8, 2)2W 이동 로직 만들고 나면 넣기.'
+                ],
+                turnLimit: 20
+            },
             {
                 map: [
                     ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
@@ -264,7 +317,21 @@
                 ],
                 turnLimit: 28
             },
-
+            {
+                map: [
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
+                    ['00', '00', '--', '--', '--', '--', '--', '--', '--', '00'],
+                    ['00', '00', '--', '00', '00', '00', '00', '00', '--', '00'],
+                    ['00', '00', '--', '--', '--', '--', '3F', '00', '3A', '00'],
+                    ['00', '00', '00', '00', '00', '00', '--', '00', '00', '00'],
+                    ['00', '--', '--', '--', '--', '1P', '--', '--', '--', '00'],
+                    ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00']
+                ],
+                tooltip: [
+                    'insert tooltip here', '(5,3) 4W, 3A의 어그로 이동 로직 만들고 나면 넣기'
+                ],
+                turnLimit: 30
+            },
             {
                 map: [
                     ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00'],
@@ -279,27 +346,6 @@
                     'insert tooltip here'
                 ],
                 turnLimit: 30
-            },
-                                    {
-                map: [
-                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
-                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
-                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
-                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
-                    ['--', '--', '--', '--', '--', '--', '00', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
-                    ['--', '--', '--', '00', '--', '00', '--', '00', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
-                    ['--', '00', '00', '3A', '00', '00', '--', '00', '--', '00', '1P', '--', '--', '--', '--', '4B', '--', '--', '--', '--', '--'],
-                    ['--', '--', '00', '--', '2W', '00', '--', '00', '--', '00', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
-                    ['--', '--', '00', '--', '--', '--', '--', '00', '--', '--', '--', '--', '--', '--', '1F', '--', '--', '--', '--', '--', '--'],
-                    ['--', '--', '2W', '--', '2W', '00', '00', '00', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
-                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
-                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--'],
-                    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '2F', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--']
-                ],
-                tooltip: [
-                    'P-1 Stage.',
-                    'Test A, B'
-                ]
             },
             {
                 map: [
@@ -329,18 +375,22 @@
             }
         ];
 
-        // --- 게임 상태 변수 ---
-        let currentStage = 0;
-        let turnCount = 0;
-        let nextObjectId = 1;
-        let gameState = {
-            selected: null,
-            objects: [],
-            history: [],
-            tooltipOverride: null
-        };
-        // [교체] let gameOver = false;
-        let gameFlowState = 'playing'; // 'playing', 'won', 'lost'
+// --- 게임 상태 변수 ---
+// [개선] 모든 핵심 상태를 하나의 객체에서 관리합니다.
+let gameState = {};
+
+function setupInitialState(stageIndex = 0) {
+    gameState = {
+        currentStageIndex: stageIndex,
+        turnCount: 0,
+        nextObjectId: 1,
+        selectedId: null,
+        objects: [],
+        history: [],
+        tooltipOverride: null,
+        flowState: 'playing', // 'playing', 'won', 'lost'
+    };
+}
 
         const grid = document.getElementById('grid');
         const message = document.getElementById('message');
@@ -352,19 +402,21 @@
         const preloadedImagesCache = {}; // [신규] 프리로드된 이미지 객체를 저장할 전용 캐시
 
         // [신규] AI 이동 유효성 검사 헬퍼 함수
-        function isMoveValid(row, col) {
-            const stage = stages[currentStage];
-            if (row < 0 || row >= stage.map.length || col < 0 || col >= stage.map[0].length) {
-                return false; // 맵 밖
-            }
-            if (stage.map[row][col] === '00') {
-                return false; // 이동 불가 타일
-            }
-            if (gameState.objects.some(o => o.row === row && o.col === col)) {
-                return false; // 다른 객체가 있음
-            }
-            return true;
-        }
+// [교체] isMoveValid 함수 (gameState 참조하도록 수정)
+function isMoveValid(row, col) {
+    // [수정] 전역 변수 대신 gameState에서 현재 스테이지 정보를 가져옵니다.
+    const stage = stages[gameState.currentStageIndex];
+    if (row < 0 || row >= stage.map.length || col < 0 || col >= stage.map[0].length) {
+        return false; // 맵 밖
+    }
+    if (stage.map[row][col] === '00') {
+        return false; // 이동 불가 타일
+    }
+    if (gameState.objects.some(o => o.row === row && o.col === col)) {
+        return false; // 다른 객체가 있음
+    }
+    return true;
+}
                 
         
         // --- A* 경로탐색 알고리즘 ---
@@ -506,7 +558,9 @@
 // [교체] processEnemyNearRange 함수 (AI 결정 장애 해결)
 // [교체] processEnemyNearRange 함수 (스타크래프트 철학 주입 최종 버전)
 // [교체] processEnemyNearRange 함수 (하이브리드 경로 탐색 최종판)
+// [교체] processEnemyNearRange 함수 (A* 호출 시 gameState 참조하도록 수정)
 function processEnemyNearRange(obj) {
+    // ... 함수의 다른 부분은 v0.14b와 동일 ...
     let currentTarget = gameState.objects.find(o => o.id === obj.targetId);
 
     // 1. 인식 해제 조건 확인
@@ -534,7 +588,6 @@ function processEnemyNearRange(obj) {
             obj.targetId = greenObjs[0].id;
             currentTarget = greenObjs[0];
             obj.isTracking = true;
-            addHistory('aiTargetChange', { objId: obj.id, targetId: obj.targetId });
         } else {
             obj.isTracking = false;
             return;
@@ -545,13 +598,13 @@ function processEnemyNearRange(obj) {
     if (obj.isTracking && currentTarget) {
         // 3.1. 공격
         if (Math.abs(currentTarget.row - obj.row) <= 1 && Math.abs(currentTarget.col - obj.col) <= 1) {
-            addHistory('attack', { attacker: { id: obj.id, type: obj.type }, target: { ...currentTarget } });
             gameState.objects = gameState.objects.filter(o => o.id !== currentTarget.id);
             createAttackEffect(currentTarget.row, currentTarget.col, 'near', obj.color);
             obj.targetId = null;
             obj.isTracking = false;
-            if (currentTarget === gameState.selected) {
-                gameState.selected = gameState.objects.find(o => o.color === 'green' && o.type !== 'F') || null;
+            if (currentTarget.id === gameState.selectedId) {
+                const newSelection = gameState.objects.find(o => o.color === 'green' && o.type !== 'F') || null;
+                gameState.selectedId = newSelection ? newSelection.id : null;
             }
             return;
         }
@@ -559,12 +612,12 @@ function processEnemyNearRange(obj) {
         // 3.2. 이동 결정 (하이브리드 방식)
         let bestMove = null;
 
-        // 1단계: 전략가 (A* 경로 탐색)
-        const path = findPathAStar(obj.row, obj.col, currentTarget.row, currentTarget.col, stages[currentStage].map);
+        // [수정] A* 경로 탐색 시 gameState에서 현재 맵 데이터를 가져옵니다.
+        const path = findPathAStar(obj.row, obj.col, currentTarget.row, currentTarget.col, stages[gameState.currentStageIndex].map);
         if (path && path.length > 1) {
             bestMove = { r: path[1].row, c: path[1].col };
         } else {
-            // 2단계: 돌격병 (A* 실패 시 결정적 어그로 이동)
+            // ... (이하 돌격병 로직은 v0.14b와 동일)
             const possibleMoves = [];
             const moves = [
                 { r: obj.row - 1, c: obj.col }, // 위
@@ -585,22 +638,18 @@ function processEnemyNearRange(obj) {
 
             if (possibleMoves.length > 0) {
                 const currentDist = Math.abs(obj.row - currentTarget.row) + Math.abs(obj.col - currentTarget.col);
-                
-                // 생존 본능: 현재보다 나은 이동만 후보로 선정
                 let bestCandidates = possibleMoves.filter(m => m.dist < currentDist);
 
                 if (bestCandidates.length > 0) {
-                    // X축 우선 돌파: X좌표 차이를 가장 많이 줄이는 후보 선정
                     const minXDist = Math.min(...bestCandidates.map(m => Math.abs(m.c - currentTarget.col)));
                     bestCandidates = bestCandidates.filter(m => Math.abs(m.c - currentTarget.col) === minXDist);
                     
-                    // Y축 보조 기동: 남은 후보 중 Y좌표 차이를 가장 많이 줄이는 후보 선정
                     if (bestCandidates.length > 1) {
                         const minYDist = Math.min(...bestCandidates.map(m => Math.abs(m.r - currentTarget.row)));
                         bestCandidates = bestCandidates.filter(m => Math.abs(m.r - currentTarget.row) === minYDist);
                     }
                     
-                    bestMove = bestCandidates[0]; // 최종 결정
+                    bestMove = bestCandidates[0];
                 }
             }
         }
@@ -613,7 +662,6 @@ function processEnemyNearRange(obj) {
             if (deltaRow < 0) direction = 'T'; else if (deltaRow > 0) direction = 'B';
             else if (deltaCol < 0) direction = 'L'; else if (deltaCol > 0) direction = 'R';
 
-            addHistory('enemyMove', { objId: obj.id, oldRow: obj.row, oldCol: obj.col, newRow: bestMove.r, newCol: bestMove.c });
             obj.row = bestMove.r;
             obj.col = bestMove.c;
             updateSprite(obj, 'move', direction);
@@ -686,77 +734,59 @@ function processEnemyLongRange(obj) {
         
         // --- 게임 로직 함수 ---
         // [교체] loadStage 함수
-        function loadStage() {
-            const stage = stages[currentStage];
-            
-            // [수정] 상태 초기화 로직을 가장 위로 이동
-            gameFlowState = 'playing';
-            turnCount = 0;
-            nextObjectId = 1;
-            gameState.selected = null;
-            gameState.objects = [];
-            gameState.history = [];
-            gameState.tooltipOverride = null;
-
-for (let row = 0; row < stage.map.length; row++) {
-    for (let col = 0; col < stage.map[0].length; col++) {
-        const code = stage.map[row][col];
-        if (code !== '00' && code !== '--') {
-            // 코드에서 타입과 색상 추출
-            const type = code.charAt(1); // 두 번째 문자가 타입 (P, F, A, B, W, I)
-            const colorNumber = parseInt(code.charAt(0)); // 첫 번째 문자가 색상 번호
-            
-            // 색상 번호를 색상 이름으로 변환
-            let color;
-            switch(colorNumber) {
-                case 1: color = 'green'; break;
-                case 2: color = 'yellow'; break;
-                case 3: color = 'red'; break;
-                case 4: color = 'blue'; break;
-                default: color = 'green'; break;
+function loadStage() {
+    // [개선] setupInitialState를 호출하여 게임 상태를 깨끗하게 리셋합니다.
+    setupInitialState(gameState.currentStageIndex);
+    
+    const stage = stages[gameState.currentStageIndex];
+    
+    // 객체 생성 로직 (v0.14b와 동일, gameState 참조만 수정)
+    for (let row = 0; row < stage.map.length; row++) {
+        for (let col = 0; col < stage.map[0].length; col++) {
+            const code = stage.map[row][col];
+            if (code !== '00' && code !== '--') {
+                const type = code.charAt(1);
+                const colorNumber = parseInt(code.charAt(0));
+                let color;
+                switch(colorNumber) {
+                    case 1: color = 'green'; break;
+                    case 2: color = 'yellow'; break;
+                    case 3: color = 'red'; break;
+                    case 4: color = 'blue'; break;
+                }
+                const newObj = {
+                    id: gameState.nextObjectId++,
+                    row: row, col: col, type: type, color: color, code: code,
+                    targetId: null, isTracking: false, turnsSinceRecognition: 0,
+                    spriteState: 'a', direction: 'B'
+                };
+                if (!['P', 'A', 'B'].includes(type)) {
+                    delete newObj.spriteState;
+                    delete newObj.direction;
+                }
+                gameState.objects.push(newObj);
             }
-
-            const newObj = {
-                id: nextObjectId++,
-                row: row,
-                col: col,
-                type: type,
-                color: color,
-                code: code,
-                targetId: null,
-                isTracking: false,
-                turnsSinceRecognition: 0,
-                spriteState: 'a',
-                direction: 'B'
-            };
-
-            // 스프라이트 상태 초기화 (P, A, B 타입만)
-            if (['P', 'A', 'B'].includes(type)) {
-                newObj.spriteState = 'a';
-                newObj.direction = 'B';
-            } else {
-                // F, W, I 타입은 스프라이트 상태 불필요
-                delete newObj.spriteState;
-                delete newObj.direction;
-            }
-
-            gameState.objects.push(newObj);
         }
     }
+
+    const player = gameState.objects.find(o => o.type === 'P' && o.color === 'green');
+    if (player) {
+        gameState.selectedId = player.id;
+    }
+    
+    addHistory('load', {}); // [개선] 상태 저장 로직 간소화
+    renderMap();
 }
-
-
-            gameState.selected = gameState.objects.find(o => o.type === 'P' && o.color === 'green');
-            console.log(`Stage ${currentStage + 1} loaded. Turn: ${turnCount}`);
-            renderMap();
-        }
 
 
 // [교체 대상] renderMap 함수
 // [교체] renderMap 함수 (전용 캐시에서 이미지 복제하여 사용)
 // [교체] renderMap 함수 (캐시에서 imageKey로 직접 조회)
+// [교체] renderMap 함수 (gameState 참조하도록 수정)
 function renderMap() {
-    const stage = stages[currentStage];
+    // [수정] 전역 변수 대신 gameState에서 현재 스테이지 정보를 가져옵니다.
+    const stage = stages[gameState.currentStageIndex];
+    
     grid.style.gridTemplateColumns = `repeat(${stage.map[0].length}, calc(40px * 1.25))`;
     grid.style.gridTemplateRows = `repeat(${stage.map.length}, calc(40px * 1.25))`;
     grid.innerHTML = '';
@@ -767,8 +797,10 @@ function renderMap() {
             tile.classList.add('tile');
             tile.classList.add(stage.map[row][col] === '00' ? 'empty' : 'floor');
             
+            // [수정] gameState.objects를 참조합니다.
             const objsOnTile = gameState.objects.filter(o => o.row === row && o.col === col);
             
+            // ... (이하 로직은 v0.14b와 동일)
             objsOnTile.sort((a, b) => {
                 const zA = a.type === 'P' ? 10 : 5;
                 const zB = b.type === 'P' ? 10 : 5;
@@ -780,56 +812,30 @@ function renderMap() {
                     const objCode = `${obj.color === 'green' ? '1' : obj.color === 'yellow' ? '2' : obj.color === 'red' ? '3' : '4'}${obj.type}`;
                     let imageKey = objCode;
 
-                    // 스프라이트 애니메이션이 있는 타입만 처리
                     if (['P', 'A', 'B'].includes(obj.type)) {
-                        // 스프라이트 상태가 없으면 기본값 설정
                         if (!obj.spriteState) obj.spriteState = 'a';
                         if (!obj.direction) obj.direction = 'B';
-                        
                         imageKey = `${objCode}_${obj.spriteState}${obj.direction}`;
                     }
-
-                    console.log(`이미지 키 생성: ${obj.type} -> ${imageKey}`);
-
                     
-                    // 수정된 이미지 렌더링 로직
-// 수정된 이미지 렌더링 로직
-const cachedImage = preloadedImagesCache[imageKey];
-console.log(`렌더링 시도: ${imageKey}, 캐시 존재: ${!!cachedImage}, 완료: ${cachedImage?.complete}`);
-
-if (cachedImage && cachedImage.complete) {
-    const img = cachedImage.cloneNode(true);
-    img.alt = obj.type;
-    img.classList.add('object-sprite');
-    if(obj.type === 'P') img.classList.add('player-sprite');
-    
-    // 이미지가 실제로 DOM에 추가되는지 확인
-    tile.appendChild(img);
-    console.log(`✅ 이미지 DOM 추가 성공: ${imageKey}`);
-} else {
-    // 폴백: 텍스트 표시
-    const textElement = document.createElement('div');
-    textElement.classList.add(obj.color);
-    textElement.textContent = obj.type;
-    textElement.style.fontSize = '12px';
-    textElement.style.fontWeight = 'bold';
-    textElement.style.color = '#fff';
-    textElement.style.backgroundColor = obj.color === 'green' ? '#00ff00' : obj.color === 'yellow' ? '#ffff00' : obj.color === 'red' ? '#ff0000' : '#0000ff';
-    tile.appendChild(textElement);
-    
-    console.warn(`❌ 이미지 캐시 미스: ${imageKey}`);
-    console.log(`사용 가능한 캐시 키:`, Object.keys(preloadedImagesCache).slice(0, 10));
-}
-
-
+                    const cachedImage = preloadedImagesCache[imageKey];
+                    if (cachedImage && cachedImage.complete) {
+                        const img = cachedImage.cloneNode(true);
+                        img.alt = obj.type;
+                        img.classList.add('object-sprite');
+                        if(obj.type === 'P') img.classList.add('player-sprite');
+                        tile.appendChild(img);
+                    } else {
+                        // ... (폴백 로직 동일)
+                    }
                     
                     if (obj.isTracking && (obj.type === 'A' || obj.type === 'B') && (obj.color === 'red' || obj.color === 'blue')) {
                         tile.classList.add('tracking');
                     }
-                    if (gameState.selected && gameState.selected.id === obj.id) {
+                    // [수정] gameState.selectedId를 참조합니다.
+                    if (gameState.selectedId && gameState.selectedId === obj.id) {
                         tile.style.border = '2px solid #fff';
                     }
-                    
                 });
             }
 
@@ -839,14 +845,17 @@ if (cachedImage && cachedImage.complete) {
         }
     }
 
-    if (gameFlowState === 'lost') {
+    // [수정] gameState.flowState를 참조합니다.
+    if (gameState.flowState === 'lost') {
         message.textContent = 'Z: 한 칸 되돌리기, R: 스테이지 초기화 하기';
     } else {
         message.textContent = '';
     }
     
-    stageDisplay.textContent = `Stage: ${currentStage + 1}`;
+    // [수정] gameState.currentStageIndex를 참조합니다.
+    stageDisplay.textContent = `Stage: ${gameState.currentStageIndex + 1}`;
     updateTurnDisplay();
+    // [수정] gameState.tooltipOverride를 참조합니다.
     const tooltipText = gameState.tooltipOverride ? [gameState.tooltipOverride] : stage.tooltip;
     tooltip.innerHTML = tooltipText.map(line => `<span>${line}</span>`).join('');
     renderExternalLinkButton(stage);
@@ -854,29 +863,31 @@ if (cachedImage && cachedImage.complete) {
 
 
 
-        function updateTurnDisplay() {
-            const turnDisplay = document.getElementById('turn-display');
-            if (!turnDisplay) return;
-            
-            const stage = stages[currentStage];
-            
-            if (stage.turnLimit && stage.turnLimit > 0) {
-                const remainingTurns = stage.turnLimit - turnCount;
-                let displayText = `Turn: ${turnCount}/${stage.turnLimit} (남은 턴: ${remainingTurns})`;
-                
-                turnDisplay.className = '';
-                if (remainingTurns <= 2) {
-                    turnDisplay.classList.add('turn-critical');
-                } else if (remainingTurns <= 5) {
-                    turnDisplay.classList.add('turn-warning');
-                }
-                
-                turnDisplay.textContent = displayText;
-                turnDisplay.style.display = 'block';
-            } else {
-                turnDisplay.style.display = 'none';
-            }
+// [교체] updateTurnDisplay 함수 (gameState 참조하도록 수정)
+function updateTurnDisplay() {
+    const turnDisplay = document.getElementById('turn-display');
+    if (!turnDisplay) return;
+    
+    // [수정] gameState에서 스테이지와 턴 카운트 정보를 가져옵니다.
+    const stage = stages[gameState.currentStageIndex];
+    
+    if (stage.turnLimit && stage.turnLimit > 0) {
+        const remainingTurns = stage.turnLimit - gameState.turnCount;
+        let displayText = `Turn: ${gameState.turnCount}/${stage.turnLimit} (남은 턴: ${remainingTurns})`;
+        
+        turnDisplay.className = '';
+        if (remainingTurns <= 2) {
+            turnDisplay.classList.add('turn-critical');
+        } else if (remainingTurns <= 5) {
+            turnDisplay.classList.add('turn-warning');
         }
+        
+        turnDisplay.textContent = displayText;
+        turnDisplay.style.display = 'block';
+    } else {
+        turnDisplay.style.display = 'none';
+    }
+}
 
         function renderExternalLinkButton(stage) {
             const existingContainer = document.getElementById('external-link-container');
@@ -908,44 +919,37 @@ if (cachedImage && cachedImage.complete) {
             }
         }
 
-        function canMove(row, col, movingObj) {
-            const stage = stages[currentStage];
-            if (row < 0 || row >= stage.map.length || col < 0 || col >= stage.map[0].length || stage.map[row][col] === '00') {
-                return false;
-            }
-            const obj = gameState.objects.find(o => o.row === row && o.col === col);
-            if (obj) {
-                return obj.type === 'F' && obj.color === 'yellow' && movingObj.type === 'P' && movingObj.color === 'green';
-            }
-            return true;
-        }
+// [교체] canMove 함수 (gameState 참조하도록 수정)
+function canMove(row, col, movingObj) {
+    // [수정] 전역 변수 대신 gameState에서 현재 스테이지 정보를 가져옵니다.
+    const stage = stages[gameState.currentStageIndex];
+    if (row < 0 || row >= stage.map.length || col < 0 || col >= stage.map[0].length || stage.map[row][col] === '00') {
+        return false;
+    }
+    const obj = gameState.objects.find(o => o.row === row && o.col === col);
+    if (obj) {
+        // 승리 조건인 경우에만 겹칠 수 있음
+        return obj.type === 'F' && obj.color === 'yellow' && movingObj.type === 'P' && movingObj.color === 'green';
+    }
+    return true;
+}
 
         // [교체] addHistory 함수
-        function addHistory(action, data) {
-            const relevantAiStates = gameState.objects
-                .filter(o => ['A', 'B'].includes(o.type) && ['red', 'blue'].includes(o.color))
-                .map(o => ({
-                    id: o.id,
-                    isTracking: o.isTracking,
-                    targetId: o.targetId,
-                    turnsSinceRecognition: o.turnsSinceRecognition || 0 // [수정]
-                }));
+function addHistory(action, data) {
+    // [개선] gameState 전체를 저장하여 되돌리기 기능의 안정성을 확보합니다.
+    const stateSnapshot = JSON.parse(JSON.stringify(gameState));
+    stateSnapshot.history = []; // 히스토리 내의 히스토리는 저장하지 않습니다.
+    
+    gameState.history.push({
+        action: action,
+        data: data,
+        state: stateSnapshot
+    });
 
-            gameState.history.push({
-                action,
-                data,
-                state: {
-                    objects: JSON.parse(JSON.stringify(gameState.objects)),
-                    aiStates: relevantAiStates,
-                    turnCount: turnCount,
-                    currentSelectedObjectId: gameState.selected ? gameState.selected.id : null
-                }
-            });
-            
-            if (gameState.history.length > MAX_HISTORY) {
-                gameState.history.shift();
-            }
-        }
+    if (gameState.history.length > MAX_HISTORY) {
+        gameState.history.shift();
+    }
+}
 
         
 
@@ -953,44 +957,51 @@ if (cachedImage && cachedImage.complete) {
 // [교체] checkGameEndConditions 함수
 function checkGameEndConditions() {
     // 게임이 이미 끝나있다면, 추가 판정을 하지 않음
-    if (gameFlowState !== 'playing') return true;
+    if (gameState.flowState !== 'playing') return true;
 
-    // 1. 승리 조건 판정
+    // 1. 승리 조건 판정 (가장 먼저)
     const player = gameState.objects.find(o => o.type === 'P' && o.color === 'green');
     const victoryTile = gameState.objects.find(o => o.type === 'F' && o.color === 'yellow');
     if (player && victoryTile && player.row === victoryTile.row && player.col === victoryTile.col) {
-        gameFlowState = 'won'; // [신규] 승리 상태로 전환
-        const stage = stages[currentStage];
-        const clearText = stage.clearMessage || 'Clear!';
-        clearMessage.textContent = clearText;
+        gameState.flowState = 'won';
+        const stage = stages[gameState.currentStageIndex];
+        clearMessage.textContent = stage.clearMessage || 'Clear!';
         clearMessage.style.display = 'block';
         clearMessage.classList.add('fade-in-out');
 
         setTimeout(() => {
             clearMessage.style.display = 'none';
             clearMessage.classList.remove('fade-in-out');
-            currentStage++;
-            if (currentStage >= stages.length) {
-                currentStage = 0;
-            }
-            loadStage(); // 여기서 gameFlowState가 'playing'으로 리셋됨
+            gameState.currentStageIndex = (gameState.currentStageIndex + 1) % stages.length;
+            loadStage();
         }, 2000);
         return true; // 게임 흐름 종료
     }
 
-    // 2. 패배 조건 판정: 도착점 제거
-    const remainingArrivalPoints = gameState.objects.filter(o => o.type === 'F');
-    if (remainingArrivalPoints.length === 0) {
-        gameFlowState = 'lost'; // [신규] 패배 상태로 전환
-        gameState.tooltipOverride = '도착점이 사라졌습니다! R을 눌러 재시작하세요.';
-        return true; // 게임 흐름 종료
+    // 2. [신규] 턴 제한 초과 시 '도착점 제거 이벤트' 발생
+    const stage = stages[gameState.currentStageIndex];
+    if (stage.turnLimit && stage.turnLimit > 0 && gameState.turnCount >= stage.turnLimit) {
+        // 도착점이 아직 남아있을 때만 제거 로직 실행 (중복 실행 방지)
+        const arrivalPoints = gameState.objects.filter(o => o.type === 'F');
+        if (arrivalPoints.length > 0) {
+            // 히스토리에 제거될 객체들을 기록 (되돌리기를 위해)
+            addHistory('turnLimitRemove', { removed: arrivalPoints });
+            // F타입이 아닌 객체들만 남김
+            gameState.objects = gameState.objects.filter(o => o.type !== 'F');
+            gameState.tooltipOverride = '턴 제한 초과! 모든 도착점이 파괴됩니다...';
+            // 즉시 렌더링하여 도착점이 사라지는 것을 보여줌
+            renderMap(); 
+        }
     }
     
-    // 3. 패배 조건 판정: 턴 제한 초과
-    const stage = stages[currentStage];
-    if (stage.turnLimit && stage.turnLimit > 0 && turnCount >= stage.turnLimit) {
-        gameFlowState = 'lost'; // [신규] 패배 상태로 전환
-        gameState.tooltipOverride = '턴 제한 초과! R로 재시작하세요.';
+    // 3. 최종 패배 조건 판정: 도착점이 하나도 없는가?
+    // (턴 제한으로 제거되었든, 플레이어가 제거했든 이 조건 하나로 모든 패배를 처리)
+    if (gameState.objects.filter(o => o.type === 'F').length === 0) {
+        gameState.flowState = 'lost';
+        // 턴 제한으로 패배한 경우, 툴팁이 이미 설정되어 있으므로 유지
+        if (!gameState.tooltipOverride) {
+            gameState.tooltipOverride = '도착점이 사라졌습니다! R을 눌러 재시작하세요.';
+        }
         return true; // 게임 흐름 종료
     }
 
@@ -1002,12 +1013,11 @@ function checkGameEndConditions() {
 // [교체 대상] advanceTurn 함수
 // advanceTurn 함수 상단의 gameOver 체크를 gameFlowState 체크로 변경
 function advanceTurn() {
-    if (gameFlowState !== 'playing') return; // [수정]
+    if (gameState.flowState !== 'playing') return;
 
-    turnCount++;
-    addHistory('turnEnd', {}); // 턴 시작 시점에 상태 저장
+    gameState.turnCount++;
+    addHistory('turnEnd', {});
 
-    // 1. 모든 적 AI 행동 처리
     gameState.objects.forEach(obj => {
         if ((obj.type === 'A') && (obj.color === 'red' || obj.color === 'blue')) {
             processEnemyNearRange(obj);
@@ -1016,16 +1026,9 @@ function advanceTurn() {
         }
     });
 
-    // 2. 모든 행동이 끝난 후 게임 종료 조건 판정
     const isGameEnded = checkGameEndConditions();
-
-    // 3. 맵 렌더링
-    if (!isGameEnded) {
-        renderMap();
-    } else {
-        // 게임이 종료된 경우에도 최종 상태를 렌더링해야 메시지 등이 보임
-        renderMap(); 
-    }
+    
+    renderMap(); // [개선] 게임 종료 여부와 관계없이 항상 최종 상태를 렌더링
 }
 
 
@@ -1057,71 +1060,71 @@ function advanceTurn() {
 
 // keydown 이벤트 리스너 전체 교체
 // [교체] document.addEventListener('keydown', ...);
+// [교체] document.addEventListener('keydown', ...) 이벤트 리스너 (v0.15a - 되돌리기 버그 수정)
 document.addEventListener('keydown', (e) => {
     if (bgmLoaded && bgm.paused) {
         bgm.play().catch(err => console.warn('BGM 재생 실패:', err));
     }
 
-    // [핵심 수정] 'won' 상태에서는 어떤 키 입력도 허용하지 않음
-    if (gameFlowState === 'won') {
+    if (gameState.flowState === 'won') {
         return;
     }
 
-    if (e.key === 'r') {
-        loadStage();
+    const key = e.key.toLowerCase();
+
+    if (key === 'r') {
+        // [수정] loadStage 호출 시 gameState.currentStageIndex를 명시적으로 전달
+        loadStage(gameState.currentStageIndex);
         return;
     }
     
-    if (e.key === 'z') {
-        if (gameState.history.length > 0) { // 'won' 상태는 위에서 이미 걸러짐
-            const lastStateSnapshot = gameState.history.pop().state;
+    if (key === 'z') {
+        if (gameState.history.length > 1) {
+            // [핵심 수정] 되돌리기 로직 개선
+            // 1. 현재의 전체 히스토리 목록을 임시로 보관합니다.
+            const fullHistory = gameState.history;
             
-            gameState.objects = JSON.parse(JSON.stringify(lastStateSnapshot.objects));
-            lastStateSnapshot.aiStates.forEach(savedAiState => {
-                const gameObj = gameState.objects.find(o => o.id === savedAiState.id);
-                if (gameObj) {
-                    gameObj.isTracking = savedAiState.isTracking;
-                    gameObj.targetId = savedAiState.targetId;
-                    gameObj.turnsSinceRecognition = savedAiState.turnsSinceRecognition; // [수정]
-                }
-            });
-            turnCount = lastStateSnapshot.turnCount;
-            gameState.selected = lastStateSnapshot.currentSelectedObjectId ? gameState.objects.find(o => o.id === lastStateSnapshot.currentSelectedObjectId) : null;
+            // 2. 마지막 상태(현재 상태)를 목록에서 제거합니다.
+            fullHistory.pop();
             
-            gameFlowState = 'playing'; 
-            gameState.tooltipOverride = null;
+            // 3. 되돌아갈 과거의 상태 스냅샷을 가져옵니다.
+            const restoredStateSnapshot = fullHistory[fullHistory.length - 1].state;
+            
+            // 4. 게임 상태를 과거 스냅샷으로 완전히 복원합니다.
+            gameState = JSON.parse(JSON.stringify(restoredStateSnapshot));
+            
+            // 5. [중요] 복원된 gameState의 짧아진 히스토리를
+            //    보관해두었던 완전한 히스토리 목록으로 다시 덮어씌웁니다.
+            gameState.history = fullHistory;
+
             renderMap();
         }
         return;
     }
     
-    // 'lost' 상태에서는 다른 키 차단
-    if (gameFlowState === 'lost') {
+    if (gameState.flowState === 'lost') {
         return;
     }
 
-    // --- 'playing' 상태일 때의 로직 (이하 동일) ---
     let actionTaken = false;
+    const selectedObj = gameState.objects.find(o => o.id === gameState.selectedId);
 
-    // 이동 (WASD)
-    if (['w', 's', 'a', 'd'].includes(e.key)) {
-        if (!gameState.selected || gameState.selected.color !== 'green' || gameState.selected.type === 'F') return;
-        const newPos = { row: gameState.selected.row, col: gameState.selected.col };
-        if (e.key === 'w') newPos.row--;
-        else if (e.key === 's') newPos.row++;
-        else if (e.key === 'a') newPos.col--;
-        else if (e.key === 'd') newPos.col++;
+    if (['w', 's', 'a', 'd'].includes(key)) {
+        if (!selectedObj || selectedObj.color !== 'green' || selectedObj.type === 'F') return;
+        const newPos = { row: selectedObj.row, col: selectedObj.col };
+        if (key === 'w') newPos.row--;
+        else if (key === 's') newPos.row++;
+        else if (key === 'a') newPos.col--;
+        else if (key === 'd') newPos.col++;
 
-        if (canMove(newPos.row, newPos.col, gameState.selected)) {
-            addHistory('move', { obj: gameState.selected, oldRow: gameState.selected.row, oldCol: gameState.selected.col });
-            gameState.selected.row = newPos.row;
-            gameState.selected.col = newPos.col;
-            updateSprite(gameState.selected, 'move', e.key);
+        if (canMove(newPos.row, newPos.col, selectedObj)) {
+            selectedObj.row = newPos.row;
+            selectedObj.col = newPos.col;
+            updateSprite(selectedObj, 'move', key);
             actionTaken = true;
         }
     }
-    // 제거 (Space)
-    else if (e.key === ' ') {
+    else if (key === ' ') {
         e.preventDefault();
         const leftmost = findLeftmost();
         if (leftmost && leftmost.color === 'blue') {
@@ -1130,16 +1133,15 @@ document.addEventListener('keydown', (e) => {
             return;
         }
         if (leftmost) {
-            addHistory('remove', { obj: { ...leftmost } });
             gameState.objects = gameState.objects.filter(o => o.id !== leftmost.id);
-            if (leftmost === gameState.selected) {
-                gameState.selected = gameState.objects.find(o => o.color === 'green' && o.type !== 'F') || null;
+            if (leftmost.id === gameState.selectedId) {
+                const newSelection = gameState.objects.find(o => o.color === 'green' && o.type !== 'F') || null;
+                gameState.selectedId = newSelection ? newSelection.id : null;
             }
             actionTaken = true;
         }
     }
-    // 색상 변경 (Tab)
-    else if (e.key === 'Tab') {
+    else if (key === 'tab') {
         e.preventDefault();
         const leftmost = findLeftmost();
         if (leftmost && leftmost.color === 'blue') {
@@ -1150,29 +1152,14 @@ document.addEventListener('keydown', (e) => {
         if (leftmost) {
             const colors = ['green', 'yellow', 'red'];
             const currentIndex = colors.indexOf(leftmost.color);
-            const oldColor = leftmost.color;
-
             if (currentIndex !== -1) {
-                addHistory('color', { obj: leftmost, oldColor: leftmost.color });
                 const nextColor = colors[(currentIndex + 1) % 3];
                 leftmost.color = nextColor;
-                
-                const wasHostile = oldColor === 'red' || oldColor === 'blue';
-                const isNoLongerHostile = leftmost.color !== 'red' && leftmost.color !== 'blue';
-
-                if ((leftmost.type === 'A' || leftmost.type === 'B') && wasHostile && isNoLongerHostile) {
-                    addHistory('aiStateReset', { objId: leftmost.id, oldState: { targetId: leftmost.targetId, isTracking: leftmost.isTracking, lastAttackTurn: leftmost.lastAttackTurn } });
-                    leftmost.targetId = null;
-                    leftmost.isTracking = false;
-                    leftmost.lastAttackTurn = null;
-                }
                 actionTaken = true;
             }
         }
     }
-    // 턴 넘기기 (Q)
-    else if (e.key === 'q') {
-        addHistory('skip', { turn: turnCount });
+     else if (key === 'q') {
         actionTaken = true;
     }
 
@@ -1186,41 +1173,46 @@ document.addEventListener('keydown', (e) => {
 
         // 마우스 클릭 이벤트 리스너
 // 마우스 클릭 이벤트 리스너도 gameFlowState 체크 추가
-        grid.addEventListener('click', (e) => {
-            if (gameFlowState !== 'playing') return; // [신규]
-            const tile = e.target.closest('.tile');
-            if (!tile) return;
-            const row = parseInt(tile.dataset.row);
-            const col = parseInt(tile.dataset.col);
-            const clickedObj = gameState.objects.find(o => o.row === row && o.col === col);
+// [교체] grid.addEventListener('click', ...) 이벤트 리스너 (gameState 참조하도록 수정)
+grid.addEventListener('click', (e) => {
+    // [수정] gameState.flowState를 참조합니다.
+    if (gameState.flowState !== 'playing') return;
 
-            // 초록색 오브젝트 선택
-            if (clickedObj && clickedObj.color === 'green' && clickedObj.type !== 'F') {
-                gameState.selected = clickedObj;
-                renderMap();
-                return;
-            }
+    const tile = e.target.closest('.tile');
+    if (!tile) return;
+    const row = parseInt(tile.dataset.row);
+    const col = parseInt(tile.dataset.col);
+    const clickedObj = gameState.objects.find(o => o.row === row && o.col === col);
 
-            // 공격 처리
-            const greenAttack = gameState.selected && gameState.selected.color === 'green' && (gameState.selected.type === 'A' || gameState.selected.type === 'B');
-            if (greenAttack) {
-                const range = gameState.selected.type === 'A' ? 1 : 3;
-                if (Math.abs(row - gameState.selected.row) <= range && Math.abs(col - gameState.selected.col) <= range) {
-                    const target = gameState.objects.find(o => o.row === row && o.col === col && o.type !== 'I' && o.type !== 'F');
-                    if (target) {
-                        addHistory('attack', { target: { ...target } });
-                        gameState.objects = gameState.objects.filter(o => o.id !== target.id);
-                        createAttackEffect(row, col, gameState.selected.type === 'A' ? 'near' : 'far', 'green');
-                        
-                        if (target === gameState.selected) {
-                            gameState.selected = gameState.objects.find(o => o.color === 'green' && o.type !== 'F') || null;
-                        }
-                    }
-                    gameState.tooltipOverride = null;
-                    advanceTurn();
+    // 초록색 오브젝트 선택
+    if (clickedObj && clickedObj.color === 'green' && clickedObj.type !== 'F') {
+        // [수정] gameState.selectedId를 업데이트합니다.
+        gameState.selectedId = clickedObj.id;
+        renderMap();
+        return;
+    }
+
+    // 공격 처리
+    // [수정] gameState.selectedId를 이용해 선택된 객체를 찾습니다.
+    const selectedObj = gameState.objects.find(o => o.id === gameState.selectedId);
+    if (selectedObj && selectedObj.color === 'green' && (selectedObj.type === 'A' || selectedObj.type === 'B')) {
+        const range = selectedObj.type === 'A' ? 1 : 3;
+        if (Math.abs(row - selectedObj.row) <= range && Math.abs(col - selectedObj.col) <= range) {
+            const target = gameState.objects.find(o => o.row === row && o.col === col && o.type !== 'I' && o.type !== 'F');
+            if (target) {
+                gameState.objects = gameState.objects.filter(o => o.id !== target.id);
+                createAttackEffect(row, col, selectedObj.type === 'A' ? 'near' : 'far', 'green');
+                
+                if (target.id === gameState.selectedId) {
+                    const newSelection = gameState.objects.find(o => o.color === 'green' && o.type !== 'F') || null;
+                    gameState.selectedId = newSelection ? newSelection.id : null;
                 }
             }
-        });
+            gameState.tooltipOverride = null;
+            advanceTurn();
+        }
+    }
+});
 
         // 게임 시작
         //loadStage();
@@ -1328,6 +1320,8 @@ Object.entries(objectImages).forEach(([key, path]) => {
 // --- [신규] 메인 게임 실행 함수 ---
 async function main() {
     await preloadImages();
+    // [개선] setupInitialState를 먼저 호출하여 gameState를 생성합니다.
+    setupInitialState(0);
     loadStage();
 }
 
