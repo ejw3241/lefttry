@@ -367,16 +367,70 @@
 
         /* 팝업창 스타일 및 애니메이션 */
         #popup-window {
-            width: 600px;
-            height: 400px;
-            background-image: url('Data/sprites/ui/popup_bg.png'); /* 팀장님께서 만드신 이미지 */
-            background-size: cover;
-            padding: 20px;
+            /* [핵심 수정] 1024x828px 비율을 기준으로 가변 크기 설정 */
+            width: calc(1024 / 1920 * 100vw);
+            height: calc(828 / 1080 * 100vh);
+            max-width: 1024px; /* 화면이 너무 커져도 팝업이 과도하게 커지는 것을 방지 */
+
+            /* [수정] 팀장님께서 만드신 이미지로 배경 설정 */
+            background-image: url('Data/sprites/ui/popup_bg.png'); 
+            background-size: 100% 100%; /* 이미지가 팝업창 크기에 정확히 맞춰지도록 */
+            background-repeat: no-repeat;
+            
+            padding: 5%; /* 내부 콘텐츠를 위한 여백 */
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transform: translateY(100vh); /* 화면 아래쪽에 숨겨진 상태 */
-            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); /* 부드러운 애니메이션 */
+            
+            transform: translateY(100vh);
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        #popup-overlay.active #popup-window {
+            transform: translateY(0);
+        }
+        #popup-content {
+            display: flex;
+            gap: 4%; /* GIF와 텍스트 사이 간격 */
+            height: 80%; /* 팝업창 내부 높이의 80%를 콘텐츠 영역으로 사용 */
+        }
+        #popup-gif {
+            width: 48%; /* 콘텐츠 영역의 48%를 GIF 너비로 사용 */
+            height: 100%;
+            object-fit: contain;
+            border: none; /* 기존 테두리 제거 */
+        }
+        #popup-text {
+            width: 48%; /* 콘텐츠 영역의 48%를 텍스트 너비로 사용 */
+            height: 100%;
+            flex-grow: 0; /* flex-grow 속성 제거하여 고정 비율 유지 */
+            overflow-y: auto; /* 내용 길어지면 스크롤 */
+            
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+            font-size: 1.0vw; /* 화면 크기에 따른 가변 폰트 크기 */
+            color: #fff;
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        #popup-buttons {
+            height: 15%; /* 팝업창 내부 높이의 15%를 버튼 영역으로 사용 */
+            display: flex;
+            justify-content: center; /* 버튼들을 중앙에 정렬 */
+            align-items: center;     /* 버튼들을 세로 중앙에 정렬 */
+            gap: 20px; /* 버튼들 사이의 간격 */
+        }
+        #popup-buttons button {
+            background: transparent;
+            border: none;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+            color: white;
+            font-size: 1.5vw;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        #popup-buttons button:hover {
+            transform: scale(1.1); /* 마우스 올리면 살짝 커지는 효과 */
+            transition: transform 0.2s;
         }
         #popup-overlay.active #popup-window {
             transform: translateY(0); /* active 클래스가 붙으면 제자리로 올라옴 */
@@ -385,9 +439,9 @@
             display: flex;
             gap: 20px;
         }
-        #popup-gif { width: 250px; height: 300px; object-fit: contain; border: 2px solid #333; }
+        /*#popup-gif { width: 250px; height: 300px; object-fit: contain; border: 2px solid #333; }
         #popup-text { flex-grow: 1; font-size: 20px; color: #fff; margin: 0; white-space: pre-wrap; }
-        #popup-buttons { text-align: right; }
+        #popup-buttons { text-align: right; }*/
 
         /* 미션 정보창 스타일 및 애니메이션 */
         #mission-overlay {
@@ -439,6 +493,7 @@
             background-image: url('Data/sprites/ui/panel3_bg.png');
             background-position: top left;
             transform: translateX(150%); /* 화면 밖으로 완전히 나가도록 여유를 줌 */
+            padding: 6.375% 11.125% 1.5% 0.75%; /* 패널3의 디자인에 맞춘 패딩 */
         }
         #mission-overlay.active .mission-panel {
             transform: translateX(0);
@@ -454,7 +509,7 @@
             flex-direction: column; /* 아이템을 위에서 아래로 쌓음 */
             justify-content: center; /* 수직 방향 중앙 정렬 */
             align-items: center;     /* 수평 방향 중앙 정렬 */
-            padding: 5%; /* 내부 여백 */
+            padding: 4% 7% 2% 9.5%; /* 내부 여백 */
         }
 
         #mission-png {
@@ -472,7 +527,7 @@
             /* [핵심] 폰트 스타일 적용 */
             font-family: 'NeoDunggeunmoPro', sans-serif; /* 기존 글꼴 상속 */
             color: #FFFFFF; /* 흰색 글꼴 */
-            font-size: 1.25vw; /* 화면 크기에 따라 가변적인 폰트 크기 */
+            font-size: 1.0vw; /* 화면 크기에 따라 가변적인 폰트 크기 */
             white-space: pre-wrap; /* JS 데이터의 줄바꿈(\n)을 그대로 표시 */
             text-align: left; /* 텍스트는 왼쪽 정렬이 가독성이 좋음 */
         }
@@ -485,7 +540,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 5%;
+            padding: 3% 13.5% 1.75% 1.75%;
         }
 
         #mission-gif {
@@ -497,22 +552,19 @@
         /* Panel 3 버튼은 이전 수정사항을 그대로 유지합니다. */
         /* [수정] 버튼 패널(panel3) 내부의 버튼들만 보이도록 처리 */
         #mission-panel3 button {
-            /* [핵심] 위치 계산의 기준이 되도록 position을 absolute로 설정 */
             position: absolute;
-
-            /* [핵심] 계산된 비율(%)을 사용하여 위치와 크기를 설정 */
             top: 54.5%;
             width: 33.5%;
             height: 34%;
             
-            /* [추가] 버튼의 배경 이미지를 투명하게 만들어 팀장님의 디자인이 보이도록 함 */
             background: transparent;
             border: none;
             
-            /* [추가] 텍스트가 보이지 않도록 처리 (이미지에 버튼이 포함되어 있으므로) */
-            color: transparent; 
+            /* [핵심 수정] 텍스트가 보이도록 color 속성을 되돌립니다. */
+            color: white; 
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+            font-size: 1.5vw; /* 버튼 텍스트 크기 */
             
-            /* [추가] 마우스 커서를 올렸을 때 손가락 모양이 되도록 */
             cursor: pointer; 
         }
         #mission-prev-btn {
