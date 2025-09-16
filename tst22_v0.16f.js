@@ -186,6 +186,7 @@ const POPUP_DATA = {
         { gif: 'Data/sprites/ui/intro_blue.gif', text: '파란색 물체는 모든 규칙에 면역입니다.\n\n가장 왼쪽에 있을 경우 Space와 Tab 키를 차단합니다.' },
         { gif: 'Data/sprites/ui/intro_attack.gif', text: '초록색 공격 유닛(1A, 1B)은 마우스 클릭으로 다른 물체를 공격하여 파괴할 수 있습니다.\n\n파란색 물체를 제거할 유일한 방법입니다.' }
     ]
+        // popup: true가 있는 다른 스테이지가 있다면 여기에 추가하세요.
 };
 
 // [신규] 미션 정보 데이터 (v0.15b)
