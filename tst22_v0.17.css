@@ -410,6 +410,7 @@
             font-size: 1.0vw; /* 화면 크기에 따른 가변 폰트 크기 */
             color: #fff;
             margin: 0;
+            align-content: center;
             white-space: pre-wrap;
         }
         #popup-buttons {
