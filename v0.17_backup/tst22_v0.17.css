@@ -1,0 +1,585 @@
+        @font-face {
+            font-family: 'NeoDunggeunmoPro';
+            src: url('Data/font/NeoDunggeunmoPro-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            background-color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+        #game-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #game-container {
+            display: inline-block;
+            background-color: #080808;
+            padding: calc(10px * 1.25);
+            position: relative;
+        }
+        .grid {
+            display: grid;
+            gap: calc(2px * 1.25);
+        }
+        .tile {
+            width: calc(40px * 1.25);
+            height: calc(40px * 1.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: calc(16px * 1.25);
+            color: #000;
+            cursor: pointer;
+            position: relative;
+        }
+        /* 기존 .tile img 스타일을 아래 내용으로 교체하거나 덧붙여주세요 */
+        .tile img.object-sprite {
+            position: absolute; /* 겹치기 위해 absolute 포지션 사용 */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            z-index: 5; /* 기본 z-index */
+            pointer-events: none;
+        }
+
+        /* [신규] 플레이어 스프라이트가 항상 위에 보이도록 z-index를 높게 설정 */
+        .tile img.player-sprite {
+            z-index: 10;
+        }
+
+        .empty { background-color: #293141; }
+        .floor { background-color: #15181F; }
+        .floor::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 0;
+        }
+        .green { background-color: #00FF00; }
+        .yellow { background-color: #FFFF00; }
+        .red { background-color: #FF0000; }
+        .blue { background-color: #0000FF; }
+        
+        /* 추적 상태 시각화 */
+        .tracking {
+            border: 3px solid #ff6600 !important;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { border-color: #ff6600; }
+            50% { border-color: #ffaa00; }
+            100% { border-color: #ff6600; }
+        }
+        
+        /* 공격 이펙트 */
+        /*.attack-effect-near {
+            position: absolute;
+            background: radial-gradient(circle, rgba(255, 100, 0, 0.9), rgba(255, 0, 0, 0.5), transparent);
+            border-radius: 50%;
+            z-index: 1000;
+            pointer-events: none;
+            animation: explode 1.5s ease-out;
+        }
+        .attack-effect-far {
+            position: absolute;
+            background: linear-gradient(90deg, rgba(255, 0, 0, 0.9), rgba(255, 100, 0, 0.7), transparent);
+            z-index: 1000;
+            pointer-events: none;
+            animation: laser 0.3s ease-out;
+        }
+        .attack-effect-blue-near {
+            position: absolute;
+            background: radial-gradient(circle, rgba(0, 100, 255, 0.9), rgba(0, 0, 255, 0.5), transparent);
+            border-radius: 50%;
+            z-index: 1000;
+            pointer-events: none;
+            animation: explode 1.5s ease-out;
+        }
+        .attack-effect-blue-far {
+            position: absolute;
+            background: linear-gradient(90deg, rgba(0, 0, 255, 0.9), rgba(0, 100, 255, 0.7), transparent);
+            z-index: 1000;
+            pointer-events: none;
+            animation: laser 0.3s ease-out;
+        }
+        
+        @keyframes explode {
+            0% { transform: scale(0.5); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        @keyframes laser {
+            0% { opacity: 1; transform: scaleX(0); }
+            50% { opacity: 1; transform: scaleX(1); }
+            100% { opacity: 0; transform: scaleX(1); }
+        }*/
+        
+        #stage-display {
+            font-size: calc(18px * 1.25);
+            text-align: center;
+            margin-bottom: calc(10px * 1.25);
+            color: #fff;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+        #message {
+            font-size: calc(20px * 1.25);
+            text-align: center;
+            margin-top: calc(10px * 1.25);
+            color: #fff;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+        #tooltip {
+            font-size: calc(16px * 1.25);
+            text-align: center;
+            margin-top: calc(10px * 1.25);
+            color: #ccc;
+            max-width: calc(600px * 1.25);
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+        #tooltip p {
+            margin: calc(5px * 1.25) 0;
+        }
+        #clear-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: calc(48px * 1.25);
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: calc(20px * 1.25) calc(40px * 1.25);
+            border-radius: calc(10px * 1.25);
+            display: none;
+            z-index: 1000;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        .fade-in-out {
+            animation: fadeInOut 2s ease-in-out;
+        }
+        @keyframes attackEffect {
+            0% { background-color: rgba(255, 0, 0, 0); }
+            50% { background-color: rgba(255, 0, 0, 0.7); }
+            100% { background-color: rgba(255, 0, 0, 0); }
+        }
+        .attack-effect {
+            animation: attackEffect 0.5s ease-in-out;
+        }
+        #bgm {
+            display: none;
+        }
+        #external-link-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: calc(15px * 1.25) calc(30px * 1.25);
+            font-size: calc(18px * 1.25);
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+            border-radius: calc(8px * 1.25);
+            cursor: pointer;
+            margin-top: calc(20px * 1.25);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        #external-link-button:hover {
+            background: linear-gradient(45deg, #45a049, #4CAF50);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        #external-link-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .external-link-container {
+            text-align: center;
+            margin-top: calc(20px * 1.25);
+            padding: calc(20px * 1.25);
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: calc(10px * 1.25);
+        }
+
+        .external-link-description {
+            color: #ccc;
+            font-size: calc(14px * 1.25);
+            margin-bottom: calc(15px * 1.25);
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+
+        #turn-display {
+            font-size: calc(16px * 1.25);
+            text-align: center;
+            margin-bottom: calc(10px * 1.25);
+            color: #fff;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+
+        .turn-warning {
+            color: #ff6600 !important;
+            font-weight: bold;
+        }
+
+        .turn-critical {
+            color: #ff0000 !important;
+            font-weight: bold;
+            animation: pulse 1s infinite;
+        }
+        /* [신규] 로딩 스크린 스타일 */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #080808;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: #fff;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+        }
+
+        #loading-text {
+            font-size: calc(24px * 1.25);
+            margin-bottom: 20px;
+        }
+
+        #loading-progress-container {
+            width: 300px;
+            height: 20px;
+            border: 2px solid #fff;
+        }
+
+        #loading-progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: #4CAF50;
+            transition: width 0.1s linear;
+        }
+
+        /* [신규] 범용 이미지 이펙트 스타일 (v0.15b) */
+        .effect-sprite {
+            position: absolute;
+            z-index: 1000;
+            pointer-events: none;
+            object-fit: contain; /* 이미지가 타일 밖으로 튀어나가지 않도록 */
+        }
+
+        /* [신규] 화면 흔들림 애니메이션 (v0.15b) */
+        .shake {
+            animation: screenShake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes screenShake {
+        10%, 90% {
+            transform: translate3d(-5px, 0, 0);
+        }
+        20%, 80% {
+            transform: translate3d(10px, 0, 0);
+        }
+        30%, 50%, 70% {
+            transform: translate3d(-8px, 0, 0);
+        }
+        40%, 60% {
+            transform: translate3d(8px, 0, 0);
+        }
+        }
+        /* [교체] 동적 레이저 이펙트 스타일 (v0.15c) */
+        /* 1. 레이저의 기본 모양과 위치만 정의 (애니메이션 없음) */
+        /* [교체] 동적 레이저 이펙트 스타일 (v0.15d - CSS 변수 사용 최종 버전) */
+        .laser-effect {
+            position: absolute;
+            height: 5px;
+            background: linear-gradient(90deg, 
+                rgba(255, 255, 255, 1) 0%, 
+                rgba(255, 100, 100, 1) 50%, 
+                rgba(255, 50, 50, 0.8) 100%);
+            border-radius: 5px;
+            z-index: 1000;
+            pointer-events: none;
+            
+            /* [핵심 수정] 애니메이션을 직접 적용합니다. */
+            animation: laser-fire 0.4s ease-out;
+        }
+
+        @keyframes laser-fire {
+            /* [핵심 수정] 애니메이션의 모든 프레임에서 JS가 전달한 각도(--laser-angle)를 사용합니다. */
+            0% {
+                transform: rotate(var(--laser-angle)) scaleX(0);
+                transform-origin: 0% 50%;
+                opacity: 1;
+            }
+            20% {
+                transform: rotate(var(--laser-angle)) scaleX(1);
+                transform-origin: 0% 50%;
+                opacity: 1;
+            }
+            100% {
+                transform: rotate(var(--laser-angle)) scaleX(1);
+                transform-origin: 0% 50%;
+                opacity: 0;
+            }
+        }
+
+        /* --- [신규] UI 시스템 스타일 (v0.15b) --- */
+
+        /* 오버레이 (화면을 어둡게 덮는 배경) */
+        .ui-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            z-index: 2000;
+            display: none; /* 평소엔 숨김 */
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 팝업창 스타일 및 애니메이션 */
+        #popup-window {
+            /* [핵심 수정] 1024x828px 비율을 기준으로 가변 크기 설정 */
+            width: calc(1024 / 1920 * 100vw);
+            height: calc(828 / 1080 * 100vh);
+            max-width: 1024px; /* 화면이 너무 커져도 팝업이 과도하게 커지는 것을 방지 */
+
+            /* [수정] 팀장님께서 만드신 이미지로 배경 설정 */
+            background-image: url('Data/sprites/ui/popup_bg.png'); 
+            background-size: 100% 100%; /* 이미지가 팝업창 크기에 정확히 맞춰지도록 */
+            background-repeat: no-repeat;
+            
+            padding: 5%; /* 내부 콘텐츠를 위한 여백 */
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            
+            transform: translateY(100vh);
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        #popup-overlay.active #popup-window {
+            transform: translateY(0);
+        }
+        #popup-content {
+            display: flex;
+            gap: 4%; /* GIF와 텍스트 사이 간격 */
+            height: 80%; /* 팝업창 내부 높이의 80%를 콘텐츠 영역으로 사용 */
+        }
+        #popup-gif {
+            width: 48%; /* 콘텐츠 영역의 48%를 GIF 너비로 사용 */
+            height: 100%;
+            object-fit: contain;
+            border: none; /* 기존 테두리 제거 */
+        }
+        #popup-text {
+            width: 48%; /* 콘텐츠 영역의 48%를 텍스트 너비로 사용 */
+            height: 100%;
+            flex-grow: 0; /* flex-grow 속성 제거하여 고정 비율 유지 */
+            overflow-y: auto; /* 내용 길어지면 스크롤 */
+            
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+            font-size: 1.0vw; /* 화면 크기에 따른 가변 폰트 크기 */
+            color: #fff;
+            margin: 0;
+            align-content: center;
+            white-space: pre-wrap;
+        }
+        #popup-buttons {
+            height: 15%; /* 팝업창 내부 높이의 15%를 버튼 영역으로 사용 */
+            display: flex;
+            justify-content: center; /* 버튼들을 중앙에 정렬 */
+            align-items: center;     /* 버튼들을 세로 중앙에 정렬 */
+            gap: 20px; /* 버튼들 사이의 간격 */
+        }
+        #popup-buttons button {
+            background: transparent;
+            border: none;
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+            color: white;
+            font-size: 1.5vw;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        #popup-buttons button:hover {
+            transform: scale(1.1); /* 마우스 올리면 살짝 커지는 효과 */
+            transition: transform 0.2s;
+        }
+        #popup-overlay.active #popup-window {
+            transform: translateY(0); /* active 클래스가 붙으면 제자리로 올라옴 */
+        }
+        #popup-content {
+            display: flex;
+            gap: 20px;
+        }
+        /*#popup-gif { width: 250px; height: 300px; object-fit: contain; border: 2px solid #333; }
+        #popup-text { flex-grow: 1; font-size: 20px; color: #fff; margin: 0; white-space: pre-wrap; }
+        #popup-buttons { text-align: right; }*/
+
+        /* 미션 정보창 스타일 및 애니메이션 */
+        #mission-overlay {
+            overflow: hidden; /* 패널이 화면 밖으로 튀어나가지 않도록 */
+        }
+    
+        .mission-panel {
+            position: absolute;
+            transition: transform 0.6s ease-in-out;
+            /* [수정] background-size를 cover가 아닌 contain으로 변경하여 이미지가 잘리지 않도록 합니다. */
+            background-repeat: no-repeat;
+            background-size: contain; 
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #mission-panel1 { /* 왼쪽 패널 (초록색) */
+            left: 0;
+            /* [수정] Y위치: (62px / 1080) * 100 = 5.74% */
+            top: 5.74%;
+            /* [수정] 크기: 1090px * 905px */
+            width:  calc(1090 / 1920 * 100vw);
+            height: calc(905 / 1080 * 100vh);
+            background-image: url('Data/sprites/ui/panel1_bg.png');
+            /* [수정] 이미지를 패널의 좌상단에 맞춥니다. */
+            background-position: top left;
+            transform: translateX(-100%);
+        }
+        #mission-panel2 { /* 오른쪽 위 패널 (빨간색) */
+            /* [수정] X위치: (1220px / 1920) * 100 = 63.54% */
+            left: 63.54%;
+            /* [수정] Y위치: (79px / 1080) * 100 = 7.31% */
+            top: 7.31%;
+            /* [수정] 크기: 700px * 763px */
+            width:  calc(700 / 1920 * 100vw);
+            height: calc(763 / 1080 * 100vh);
+            background-image: url('Data/sprites/ui/panel2_bg.png');
+            background-position: top left;
+            transform: translateX(150%); /* 화면 밖으로 완전히 나가도록 여유를 줌 */
+        }
+        #mission-panel3 { /* 오른쪽 아래 패널 (파란색) */
+            /* [수정] X위치: (1220px / 1920) * 100 = 63.54% */
+            left: 63.54%;
+            /* [수정] Y위치: (756px / 1080) * 100 = 70% */
+            top: 70%;
+            /* [수정] 크기: 700px * 240px */
+            width:  calc(700 / 1920 * 100vw);
+            height: calc(240 / 1080 * 100vh);
+            background-image: url('Data/sprites/ui/panel3_bg.png');
+            background-position: top left;
+            transform: translateX(150%); /* 화면 밖으로 완전히 나가도록 여유를 줌 */
+            padding: 6.375% 11.125% 1.5% 0.75%; /* 패널3의 디자인에 맞춘 패딩 */
+        }
+        #mission-overlay.active .mission-panel {
+            transform: translateX(0);
+        }
+
+        /* [수정] 패널 내부 콘텐츠는 배경 이미지 위에 올라가므로 숨김 처리 (필요 시 재활성화) */
+        /* Panel 1 (PNG + Text) 레이아웃 설정 */
+        #mission-panel1 {
+            /* ... 기존 패널 위치/크기/배경 속성 ... */
+
+            /* [핵심] Flexbox를 사용하여 내부 콘텐츠를 세로로 정렬합니다. */
+            display: flex;
+            flex-direction: column; /* 아이템을 위에서 아래로 쌓음 */
+            justify-content: center; /* 수직 방향 중앙 정렬 */
+            align-items: center;     /* 수평 방향 중앙 정렬 */
+            padding: 4% 7% 2% 9.5%; /* 내부 여백 */
+        }
+
+        #mission-png {
+            width: 90%;  /* 패널 내부 너비의 90% */
+            height: 55%; /* 패널 내부 높이의 55% */
+            object-fit: contain; /* 이미지가 잘리지 않고 비율을 유지하도록 */
+            margin-bottom: 3%; /* 이미지와 텍스트 사이의 간격 */
+        }
+
+        #mission-text {
+            width: 90%;   /* 패널 내부 너비의 90% */
+            height: 35%;  /* 패널 내부 높이의 35% */
+            overflow-y: auto; /* 내용이 길어지면 스크롤바 표시 */
+            
+            /* [핵심] 폰트 스타일 적용 */
+            font-family: 'NeoDunggeunmoPro', sans-serif; /* 기존 글꼴 상속 */
+            color: #FFFFFF; /* 흰색 글꼴 */
+            font-size: 1.0vw; /* 화면 크기에 따라 가변적인 폰트 크기 */
+            white-space: pre-wrap; /* JS 데이터의 줄바꿈(\n)을 그대로 표시 */
+            text-align: left; /* 텍스트는 왼쪽 정렬이 가독성이 좋음 */
+        }
+
+        /* Panel 2 (GIF only) 레이아웃 설정 */
+        #mission-panel2 {
+            /* ... 기존 패널 위치/크기/배경 속성 ... */
+
+            /* [핵심] Flexbox를 사용하여 GIF를 패널의 정중앙에 배치합니다. */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3% 13.5% 1.75% 1.75%;
+        }
+
+        #mission-gif {
+            max-width: 100%;  /* 패널(패딩 제외)을 넘어가지 않도록 */
+            max-height: 100%;
+            object-fit: contain; /* 이미지가 잘리지 않고 비율을 유지하도록 */
+        }
+
+        /* Panel 3 버튼은 이전 수정사항을 그대로 유지합니다. */
+        /* [수정] 버튼 패널(panel3) 내부의 버튼들만 보이도록 처리 */
+        #mission-panel3 button {
+            position: absolute;
+            top: 54.5%;
+            width: 33.5%;
+            height: 34%;
+            
+            background: transparent;
+            border: none;
+            
+            /* [핵심 수정] 텍스트가 보이도록 color 속성을 되돌립니다. */
+            color: white; 
+            font-family: 'NeoDunggeunmoPro', sans-serif;
+            font-size: 1.5vw; /* 버튼 텍스트 크기 */
+            
+            cursor: pointer; 
+        }
+        #mission-prev-btn {
+            /* [핵심] 계산된 비율(%)을 사용하여 왼쪽 위치 설정 */
+            left: 1.25%;
+        }
+        #mission-next-btn {
+            /* [핵심] 계산된 비율(%)을 사용하여 왼쪽 위치 설정 */
+            left: 37%;
+        }
+
+        /* [추가] 버튼에 마우스를 올렸을 때 약간 밝아지는 효과로 피드백 제공 */
+        #mission-panel3 button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px; /* 버튼 모양에 맞게 조절 가능 */
+}
+        /* ... 미션 정보창 내부 콘텐츠 스타일 (png, gif, text, buttons) ... */

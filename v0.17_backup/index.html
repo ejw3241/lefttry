@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>왼트_LeftTry</title>
+    <link rel="stylesheet" href="tst22_v0.17.css">
+</head>
+<body>
+        <!-- [신규] 로딩 스크린 요소 추가 -->
+    <div id="loading-screen">
+        <div id="loading-text">Loading...</div>
+        <div id="loading-progress-container">
+            <div id="loading-progress-bar"></div>
+        </div>
+    </div>
+    <div id="game-wrapper">
+        <div id="game-container">
+            <div id="stage-display"></div>
+            <div id="turn-display"></div>
+            <div id="grid" class="grid"></div>
+            <div id="message"></div>
+        </div>
+        <div id="tooltip"></div>
+    </div>
+    <div id="clear-message">Clear!</div>
+    <audio id="bgm" loop></audio>
+    <!-- [신규] 팝업창 UI 구조 (v0.15b) -->
+    <div id="popup-overlay" class="ui-overlay">
+        <div id="popup-window">
+            <div id="popup-content">
+                <img id="popup-gif" src="" alt="Popup GIF">
+                <p id="popup-text"></p>
+            </div>
+            <div id="popup-buttons">
+                <!-- 버튼들은 JavaScript가 동적으로 생성합니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- [신규] 미션 정보창 UI 구조 (v0.15b) -->
+    <div id="mission-overlay" class="ui-overlay">
+        <div id="mission-panel1" class="mission-panel">
+            <img id="mission-png" src="" alt="Mission Image">
+            <p id="mission-text"></p>
+        </div>
+        <div id="mission-panel2" class="mission-panel">
+            <img id="mission-gif" src="" alt="Mission GIF">
+        </div>
+        <div id="mission-panel3" class="mission-panel">
+            <button id="mission-prev-btn">[Prev]</button>
+            <button id="mission-next-btn">[Next]</button>
+        </div>
+    </div>
+    <script async src="tst22_v0.17.js"></script>
+</body>
+</html>
